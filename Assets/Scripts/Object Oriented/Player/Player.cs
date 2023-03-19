@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
 public class Player : MonoBehaviour
 {
-    #region SerializedFields
+    #region Serialized Fields
     [Header("Cached References")]
     // ReSharper disable once InconsistentNaming
     Rigidbody2D RB;
@@ -48,7 +48,7 @@ public class Player : MonoBehaviour
         cam      = Camera.main;
         RB       = GetComponent<Rigidbody2D>();
         collider = GetComponent<CapsuleCollider2D>();
-        //sr       = GetComponentInChildren<SpriteRenderer>();
+        sr       = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -83,17 +83,17 @@ public class Player : MonoBehaviour
         Vector3 mousePos  = cam.ScreenToWorldPoint(Input.mousePosition);
 
         // flip the sprite if the mouse is on the left side of the player
-        if (mousePos.x < transform.position.x)
+        if (mousePos.x > transform.position.x)
         {
-            sr.flipY = true;
+            sr.flipX = true;
             IsFacingRight = false;
-            Debug.Log("Facing Left");
+            Debug.Assert(!IsFacingRight, "Facing Left");
         }
         else
         {
-            sr.flipY = false;
+            sr.flipX = false;
             IsFacingRight = true;
-            Debug.Log("Facing Right");
+            Debug.Assert(IsFacingRight, "Facing Right");
         }
     }
 }

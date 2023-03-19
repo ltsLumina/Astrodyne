@@ -2,31 +2,24 @@ using UnityEngine;
 
 public class Astrodyne : MonoBehaviour
 {
+    #region Serialized Fields
     [Header("Cached References")]
     Player player;
-    [SerializeField] Transform point;
 
-    public Transform Point
-    {
-        get => point;
-        set => point = value;
-    }
+    [Header("Point to rotate around."), Space(15)]
+    [SerializeField] Transform point;
 
     [Header("Configurable Variables"), Tooltip("The speed at which the weapon orbits around the player. \n (Degrees/Second)")]
     [SerializeField] float orbitSpeed;
+    #endregion
 
-    void Start()
-    {
-        player = FindObjectOfType<Player>();
-    }
+    void Start() => player = FindObjectOfType<Player>();
 
-    void Update()
-    {
-        Orbit(orbitSpeed);
-    }
+    void Update() => Orbit(orbitSpeed);
 
     void Orbit(float orbitSpeed)
     {
+        // Set the position of the orbiting object to the player's position.
         point.position = player.transform.position;
 
         // Rotate the weapon around the player.
