@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UsefulMethods;
 
 [RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
 public class Player : MonoBehaviour
@@ -11,7 +12,6 @@ public class Player : MonoBehaviour
     Rigidbody2D RB;
     new CapsuleCollider2D collider;
     Camera cam;
-    [SerializeField]
     SpriteRenderer sr;
 
     [Header("Movement")]
@@ -39,7 +39,15 @@ public class Player : MonoBehaviour
 
     #region Properties
     [field: Header("Configurable Variables")]
-    public bool IsFacingRight { get; set; } = true;
+    public bool IsFacingRight { get; private set; } = true;
+
+    public float CurrentHealth
+    {
+        get => currentHealth;
+        set => currentHealth = value;
+    }
+
+    public bool IsDead { get; set; }
     #endregion
 
     // Start is called before the first frame update
@@ -54,46 +62,77 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        PlayerLogic();
+    }
+
+    void PlayerLogic()
+    {
         Boundaries();
+
+        void Boundaries()
+        {
+            // Keeps the player within the camera's view.
+            Vector3 viewPos = cam.WorldToViewportPoint(transform.position);
+            viewPos.x          = Mathf.Clamp01(viewPos.x);
+            viewPos.y          = Mathf.Clamp01(viewPos.y);
+            transform.position = cam.ViewportToWorldPoint(viewPos);
+        }
+
         Movement();
+
+        void Movement()
+        { // Movement: WASD or Arrow Keys
+            // Moves the player by getting their input and multiplying it by the move speed.
+            // Gives the movement an acceleration/deceleration feel.
+            float x = Input.GetAxis("Horizontal");
+            float y = Input.GetAxis("Vertical");
+            RB.velocity = new Vector2(x, y) * moveSpeed;
+        }
+
         FaceMouse();
-    }
 
-    void Boundaries()
-    {
-        // Keeps the player within the camera's view.
-        Vector3 viewPos = cam.WorldToViewportPoint(transform.position);
-        viewPos.x       = Mathf.Clamp01(viewPos.x);
-        viewPos.y       = Mathf.Clamp01(viewPos.y);
-        transform.position = cam.ViewportToWorldPoint(viewPos);
-    }
-
-    void Movement()
-    { // Movement: WASD or Arrow Keys
-        // Moves the player by getting their input and multiplying it by the move speed.
-        // Gives the movement an acceleration/deceleration feel.
-        float x = Input.GetAxis("Horizontal");
-        float y = Input.GetAxis("Vertical");
-        RB.velocity = new Vector2(x, y) * moveSpeed;
-    }
-
-    void FaceMouse()
-    {
-        // Smoothly rotates player to face mouse.
-        Vector3 mousePos  = cam.ScreenToWorldPoint(Input.mousePosition);
-
-        // flip the sprite if the mouse is on the left side of the player
-        if (mousePos.x > transform.position.x)
+        void FaceMouse()
         {
-            sr.flipX = true;
-            IsFacingRight = false;
-            Debug.Assert(!IsFacingRight, "Facing Left");
+            // Smoothly rotates player to face mouse.
+            Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+
+            // flip the sprite if the mouse is on the left side of the player
+            if (mousePos.x > transform.position.x)
+            {
+                sr.flipX      = true;
+                IsFacingRight = false;
+                Debug.Assert(!IsFacingRight, "Facing Left");
+            }
+            else
+            {
+                sr.flipX      = false;
+                IsFacingRight = true;
+                Debug.Assert(IsFacingRight, "Facing Right");
+            }
         }
-        else
+
+        HealthLogic();
+
+        void HealthLogic()
         {
-            sr.flipX = false;
-            IsFacingRight = true;
-            Debug.Assert(IsFacingRight, "Facing Right");
+            IsDead = CurrentHealth <= 0;
+
+            // If the player's health is less than or equal to 0, then the player is dead.
+            if (IsDead) HandleDeath();
+
+            void HandleDeath()
+            {
+                // Debug that the player is dead.
+                Debug.Log("Player is dead.");
+
+                // Freezes the player's movement and reloads the scene after 2 seconds.
+                RB.constraints = RigidbodyConstraints2D.FreezeAll;
+                //DoAfterDelay(() => Transition.CloseCurtains(), 2f, true);
+                //TODO: ^ Can't use CloseCurtains() because it's static.
+                //DoAfterDelay(SceneManagerExtended.ReloadScene, 2f, false);
+                //TODO: ^ This causes a loop that freezes unity.
+            }
         }
     }
+
 }
