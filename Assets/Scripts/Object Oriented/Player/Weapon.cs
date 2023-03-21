@@ -1,6 +1,6 @@
-using System.Linq;
+using System;
 using System.Threading;
-using Unity.VisualScripting;
+using System.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Debug;
 using static UsefulMethods;
@@ -13,7 +13,6 @@ public class Weapon : MonoBehaviour
     Transform playerPos;
     Player player;
     ObjectPool bulletPool;
-
     CancellationTokenSource cancellationToken;
 
     [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon."), ReadOnly]
@@ -32,6 +31,8 @@ public class Weapon : MonoBehaviour
         player     = FindObjectOfType<Player>();
         bulletPool = FindObjectOfType<ObjectPool>();
 
+        cancellationToken = new CancellationTokenSource();
+
         // Assertions:
         // Return bullet to pool after bulletLifetime seconds. Also asserting that the bulletLifetime is greater than 0.
         Assert(bulletLifetime > 0, "Bullet lifetime is less than or equal to 0. This will cause the bullet to never be returned to the pool.");
@@ -42,6 +43,8 @@ public class Weapon : MonoBehaviour
         if (!player.IsDead) WeaponLogic();
     }
 
+
+    // ReSharper disable Unity.PerformanceAnalysis
     /// <summary>
     /// Handles all the logic for the weapon such as the rotation, position, and shooting.
     /// </summary>
@@ -75,8 +78,7 @@ public class Weapon : MonoBehaviour
         void HandleShooting()
         {
             // Increments the time since the last shot, and while it is larger than the fireRate, the player can shoot.
-            // Using fixedDeltaTime instead of deltaTime as it felt better; might be a placebo.
-            timeSinceLastShot += Time.fixedDeltaTime;
+            timeSinceLastShot += Time.deltaTime;
 
             if (!Input.GetMouseButton(0) || !(timeSinceLastShot > fireRate)) return;
             if (bulletPool == null) return;
@@ -93,12 +95,8 @@ public class Weapon : MonoBehaviour
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
 
-            // Pass the cancellation token to the DoAfterDelay method
-            DoAfterDelay(() => pooledBullet.SetActive(false), bulletLifetime);
-
-            //TODO: As it stands right now, the cancellationToken cancels the task which ruins the objectpool.
-            //TODO: As a whole, the issue is that if I exit the game while *A* bullet is still active, unity logs a MissingReferenceException error.
-            //TODO: Apparently it also still breaks every other time I enter runtime.
+            // Return the bullet to the pool after bulletLifetime seconds.
+            _= DoAfterDelayAsync( () => pooledBullet.SetActive(false), bulletLifetime);
         }
     }
 }

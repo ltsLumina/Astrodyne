@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,9 +7,15 @@ public class ObjectPool : MonoBehaviour
     [SerializeField] GameObject objectPrefab;
     [SerializeField] int startAmount;
 
-    internal readonly static List<GameObject> pooledObjects = new List<GameObject>();
+    readonly static List<GameObject> pooledObjects = new List<GameObject>();
 
-    private void Start()
+    void Awake()
+    {
+        // Clearing the list of pooled objects in Awake in case the list is not empty when the game is restarted.
+        pooledObjects.Clear();
+    }
+
+    void Start()
     {
         ObjectPoolManager.AddExistingPool(this);
         InstantiateStartAmount();

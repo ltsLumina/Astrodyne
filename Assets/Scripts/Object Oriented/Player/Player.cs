@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.Debug;
 using static UsefulMethods;
 
 [RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
@@ -48,7 +50,7 @@ public class Player : MonoBehaviour
         set => currentHealth = value;
     }
 
-    public bool IsDead { get; set; }
+    public bool IsDead { get; private set; }
     #endregion
 
     // Start is called before the first frame update
@@ -67,6 +69,9 @@ public class Player : MonoBehaviour
         if (!IsDead) PlayerLogic();
     }
 
+    /// <summary>
+    /// Player logic is handled entirely in this method where each part of the logic is split into its own local function.
+    /// </summary>
     void PlayerLogic()
     {
         Boundaries();
@@ -103,13 +108,13 @@ public class Player : MonoBehaviour
             {
                 sr.flipX      = true;
                 IsFacingRight = false;
-                Debug.Assert(!IsFacingRight, "Facing Left");
+                Assert(!IsFacingRight, "Facing Left");
             }
             else
             {
                 sr.flipX      = false;
                 IsFacingRight = true;
-                Debug.Assert(IsFacingRight, "Facing Right");
+                Assert(IsFacingRight, "Facing Right");
             }
         }
 
@@ -124,12 +129,12 @@ public class Player : MonoBehaviour
 
             void HandleDeath()
             {
-                // Debug that the player is dead.
-                Debug.Log("Player is dead.");
-
-                // Freezes the player's movement and reloads the scene after 2 seconds.
+                // Debug that the player is dead and freeze their movement.
+                Log("Player is dead.");
                 RB.constraints = RigidbodyConstraints2D.FreezeAll;
-                DoAfterDelay(() => transition.CloseCurtains(), 2f, true);
+
+                // Close the curtains and wait 2 seconds before loading the game over scene.
+                _= DoAfterDelayAsync(() => transition.CloseCurtains(), 2, true);
             }
         }
     }

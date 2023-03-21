@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,13 +64,16 @@ internal static class UsefulShortcuts
 internal static class UsefulMethods
 {
     /// <summary>
-    /// Allows you to call a method after a delay through the use of delegates.
+    /// Allows you to call a method after a delay through the use of an asynchronous operation.
+    /// Keep in mind, that the method using this method needs to be an asynchronous method as well
+    /// UNLESS it is called at the very end of the method, where you can discard ( _= ) the task.
+    /// <example> _= DoAfterDelayAsync( () => action(), delayInSeconds);  </example>
     /// </summary>
-    /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="action">The action or method to run.</param>
+    /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
     /// <param name="cancellationToken">Cancellation Token for cancelling the currently running task. </param>
-    public static async Task DoAfterDelay(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
+    public static async Task DoAfterDelayAsync(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
     {
         if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
         var timeSpan = TimeSpan.FromSeconds(delayInSeconds);
@@ -86,7 +88,27 @@ internal static class UsefulMethods
         }
         action();
         if (debugLog) Debug.Log("Action completed.");
+    }
 
+    /// <summary>
+    /// !WARNING! This method is not asynchronous, and will block the main thread, causing the game to freeze.
+    /// However, the purpose of this method is to allow you to call a method after a delay, without having to make the method asynchronous.
+    /// Unsure if this method even works in its current state.
+    /// </summary>
+    /// <param name="action">The action or method to run.</param>
+    /// <param name="delayInSeconds">The delay before running the method.</param>
+    /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
+    /// <param name="onComplete">An action to be completed after the initial action is finished. Not required to be used.</param>
+    public static void DoAfterDelay(Action action, float delayInSeconds, bool debugLog = false, Action onComplete = null)
+    {
+        if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
+        var timeSpan = TimeSpan.FromSeconds(delayInSeconds);
+        Task.Delay(timeSpan).ContinueWith(_ =>
+        {
+            action();
+            if (debugLog) Debug.Log("Action completed.");
+            onComplete?.Invoke();
+        });
     }
 }
 
@@ -96,6 +118,7 @@ public class ReadOnlyAttribute : PropertyAttribute
 /// <summary>
 /// Allows you to add '[ReadOnly]' before a variable so that it is shown but not editable in the inspector.
 /// Small but useful script, to make your inspectors look pretty and useful :D
+/// <example> [SerializedField, ReadOnly] int myInt; </example>
 /// </summary>
 [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
 public class ReadOnlyPropertyDrawer : PropertyDrawer

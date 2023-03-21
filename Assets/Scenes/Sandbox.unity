@@ -282,7 +282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
-  startAmount: 4
+  startAmount: 7
 --- !u!4 &241201576
 Transform:
   m_ObjectHideFlags: 0
@@ -744,7 +744,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeSinceLastShot: 0
-  fireRate: 1
+  fireRate: 0.3
   bulletLifetime: 2
   bulletForce: 15
 --- !u!1 &715043967
