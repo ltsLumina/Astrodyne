@@ -93,17 +93,12 @@ public class Weapon : MonoBehaviour
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
 
-            // Cancel any previous DoAfterDelay tasks that are still running
-            cancellationToken?.Cancel();
-
-            // Create a new cancellation token source
-            cancellationToken = new CancellationTokenSource();
-
             // Pass the cancellation token to the DoAfterDelay method
-            DoAfterDelay(() => pooledBullet.SetActive(false), bulletLifetime, cancellationToken: cancellationToken.Token);
+            DoAfterDelay(() => pooledBullet.SetActive(false), bulletLifetime);
 
-            //TODO: idk man this is confusing. Cancellation token magic, except it doesn't work.
+            //TODO: As it stands right now, the cancellationToken cancels the task which ruins the objectpool.
             //TODO: As a whole, the issue is that if I exit the game while *A* bullet is still active, unity logs a MissingReferenceException error.
+            //TODO: Apparently it also still breaks every other time I enter runtime.
         }
     }
 }

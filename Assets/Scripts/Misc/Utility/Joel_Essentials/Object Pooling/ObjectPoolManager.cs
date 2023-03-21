@@ -15,7 +15,8 @@ public static class ObjectPoolManager
     {
         get
         {
-            if (objectPoolParent == null) objectPoolParent = new GameObject("--- Object Pools ---").transform;
+            if (objectPoolParent == null)
+                objectPoolParent = new GameObject("--- Object Pools ---").transform;
 
             return objectPoolParent;
         }

@@ -27,6 +27,7 @@ internal static class UsefulShortcuts
     /// Note: These methods are local functions, and are only accessible within this method.
     /// </summary>
 
+#if UNITY_EDITOR
     [Shortcut("Damage Player", KeyCode.F1), ContextMenu("Damage Player")]
     static void DamagePlayer()
     {
@@ -58,6 +59,7 @@ internal static class UsefulShortcuts
         SceneManagerExtended.ReloadScene();
         Debug.Log("Scene reloaded.");
     }
+#endif
 }
 
 internal static class UsefulMethods
@@ -68,6 +70,7 @@ internal static class UsefulMethods
     /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="action">The action or method to run.</param>
     /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
+    /// <param name="cancellationToken">Cancellation Token for cancelling the currently running task. </param>
     public static async Task DoAfterDelay(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
     {
         if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
