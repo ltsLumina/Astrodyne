@@ -1,37 +1,45 @@
-using System;
 using System.Linq;
-using Unity.Mathematics;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Debug;
+using static UsefulMethods;
 
 public class Weapon : MonoBehaviour
 {
     #region Serialized Fields
     [Header("Cached References")]
+    Camera cam;
     Transform playerPos;
     Player player;
-    Camera cam;
+    ObjectPool bulletPool;
 
-    [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon.")]
-    float timeSinceLastShot;
-    [SerializeField, Tooltip("The rate at which the weapon can shoot. \n RPM (Rounds Per Minute)")]
-    float fireRate;
+    CancellationTokenSource cancellationToken;
+
+    [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon."), ReadOnly]
+    [SerializeField] float timeSinceLastShot;
+    [SerializeField] float fireRate;
 
     [Header("Bullet Fields")]
-    [SerializeField] GameObject bullet; Rigidbody2D bulletRB;
+    [SerializeField] float bulletLifetime;
     [SerializeField] float bulletForce;
     #endregion
 
     void Start()
     {
-        playerPos = FindObjectOfType<Player>().transform;
-        player    = FindObjectOfType<Player>();
-        cam       = Camera.main;
+        cam        = Camera.main;
+        playerPos  = FindObjectOfType<Player>().transform;
+        player     = FindObjectOfType<Player>();
+        bulletPool = FindObjectOfType<ObjectPool>();
+
+        // Assertions:
+        // Return bullet to pool after bulletLifetime seconds. Also asserting that the bulletLifetime is greater than 0.
+        Assert(bulletLifetime > 0, "Bullet lifetime is less than or equal to 0. This will cause the bullet to never be returned to the pool.");
     }
 
     void Update()
     {
-        WeaponLogic();
+        if (!player.IsDead) WeaponLogic();
     }
 
     /// <summary>
@@ -67,16 +75,35 @@ public class Weapon : MonoBehaviour
         void HandleShooting()
         {
             // Increments the time since the last shot, and while it is larger than the fireRate, the player can shoot.
-            timeSinceLastShot += Time.deltaTime;
+            // Using fixedDeltaTime instead of deltaTime as it felt better; might be a placebo.
+            timeSinceLastShot += Time.fixedDeltaTime;
 
             if (!Input.GetMouseButton(0) || !(timeSinceLastShot > fireRate)) return;
-            // Instantiates an object and adds force to it.
-            bullet   = Instantiate(bullet, transform.position, transform.rotation);
-            bulletRB = bullet.GetComponent<Rigidbody2D>();
+            if (bulletPool == null) return;
+
+            // Get a bullet from the object pool.
+            GameObject pooledBullet = bulletPool.GetPooledObject(true);
+            pooledBullet.transform.position = transform.position;
+            pooledBullet.transform.rotation = transform.rotation;
+
+            // Add force to the bullet.
+            Rigidbody2D bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
             bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
 
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
+
+            // Cancel any previous DoAfterDelay tasks that are still running
+            cancellationToken?.Cancel();
+
+            // Create a new cancellation token source
+            cancellationToken = new CancellationTokenSource();
+
+            // Pass the cancellation token to the DoAfterDelay method
+            DoAfterDelay(() => pooledBullet.SetActive(false), bulletLifetime, cancellationToken: cancellationToken.Token);
+
+            //TODO: idk man this is confusing. Cancellation token magic, except it doesn't work.
+            //TODO: As a whole, the issue is that if I exit the game while *A* bullet is still active, unity logs a MissingReferenceException error.
         }
     }
 }

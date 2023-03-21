@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     new CapsuleCollider2D collider;
     Camera cam;
     SpriteRenderer sr;
+    Transition transition;
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 5f;
@@ -53,16 +54,17 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cam      = Camera.main;
-        RB       = GetComponent<Rigidbody2D>();
-        collider = GetComponent<CapsuleCollider2D>();
-        sr       = GetComponentInChildren<SpriteRenderer>();
+        cam        = Camera.main;
+        RB         = GetComponent<Rigidbody2D>();
+        collider   = GetComponent<CapsuleCollider2D>();
+        sr         = GetComponentInChildren<SpriteRenderer>();
+        transition = FindObjectOfType<Transition>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        PlayerLogic();
+        if (!IsDead) PlayerLogic();
     }
 
     void PlayerLogic()
@@ -81,7 +83,7 @@ public class Player : MonoBehaviour
         Movement();
 
         void Movement()
-        { // Movement: WASD or Arrow Keys
+        {   // Movement: WASD or Arrow Keys
             // Moves the player by getting their input and multiplying it by the move speed.
             // Gives the movement an acceleration/deceleration feel.
             float x = Input.GetAxis("Horizontal");
@@ -127,10 +129,7 @@ public class Player : MonoBehaviour
 
                 // Freezes the player's movement and reloads the scene after 2 seconds.
                 RB.constraints = RigidbodyConstraints2D.FreezeAll;
-                //DoAfterDelay(() => Transition.CloseCurtains(), 2f, true);
-                //TODO: ^ Can't use CloseCurtains() because it's static.
-                //DoAfterDelay(SceneManagerExtended.ReloadScene, 2f, false);
-                //TODO: ^ This causes a loop that freezes unity.
+                DoAfterDelay(() => transition.CloseCurtains(), 2f, true);
             }
         }
     }

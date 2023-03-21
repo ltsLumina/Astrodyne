@@ -6,6 +6,7 @@ TagManager:
   tags:
   - VCam
   - Bullet
+  - Orb
   layers:
   - Default
   - TransparentFX
@@ -13,8 +14,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Orb
+  - Bullet
   - 
   - 
   - 

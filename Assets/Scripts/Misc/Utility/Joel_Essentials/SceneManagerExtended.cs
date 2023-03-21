@@ -52,7 +52,19 @@ public static class SceneManagerExtended
             Debug.LogWarning("BuildIndex invalid/unavailable. Loading scene with an index of 0...");
             buildIndex = 0;
         }
-
         return buildIndex;
+    }
+
+    /// <summary>
+    ///     Stops playmode if used in the editor, or quits the application if in a build.
+    /// </summary>
+    public static void QuitGame()
+    {
+#if UNITY_EDITOR
+        Debug.Log("Quitting game...");
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

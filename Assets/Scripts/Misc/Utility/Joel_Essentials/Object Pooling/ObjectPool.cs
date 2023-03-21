@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
@@ -7,7 +9,7 @@ public class ObjectPool : MonoBehaviour
     [SerializeField] GameObject objectPrefab;
     [SerializeField] int startAmount;
 
-    private List<GameObject> pooledObjects = new List<GameObject>();
+    internal readonly static List<GameObject> pooledObjects = new List<GameObject>();
 
     private void Start()
     {
@@ -45,8 +47,7 @@ public class ObjectPool : MonoBehaviour
     /// <returns>The object that was created.</returns>
     public GameObject CreatePooledObject()
     {
-        GameObject newObject = Instantiate(objectPrefab);
-        newObject.transform.parent = this.transform;
+        GameObject newObject = Instantiate(objectPrefab, transform, true);
         newObject.SetActive(false);
         pooledObjects.Add(newObject);
         return newObject;
@@ -61,18 +62,12 @@ public class ObjectPool : MonoBehaviour
     {
         GameObject objectToReturn = null;
 
-        foreach (GameObject pooledObject in pooledObjects)
+        foreach (GameObject pooledObject in pooledObjects.Where(pooledObject => !pooledObject.activeInHierarchy))
         {
-            if (!pooledObject.activeInHierarchy)
-            {
-                objectToReturn = pooledObject;
-            }
+            objectToReturn = pooledObject;
         }
 
-        if (objectToReturn == null)
-        {
-            objectToReturn = CreatePooledObject();
-        }
+        if (objectToReturn == null) objectToReturn = CreatePooledObject();
 
         objectToReturn.SetActive(setActive);
         return objectToReturn;
@@ -82,8 +77,6 @@ public class ObjectPool : MonoBehaviour
     /// Returns the prefab of the object this pool contains.
     /// </summary>
     /// <returns></returns>
-    public GameObject GetPooledObjectPrefab()
-    {
-        return objectPrefab;
-    }
+    public GameObject GetPooledObjectPrefab() => objectPrefab;
+
 }

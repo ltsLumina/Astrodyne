@@ -20,7 +20,7 @@ public class Astrodyne : MonoBehaviour
     void Orbit(float orbitSpeed)
     {
         // Set the position of the orbiting object to the player's position.
-        point.position = player.transform.position;
+        //point.position = player.transform.position;
 
         // Rotate the weapon around the player.
         transform.RotateAround(point.position, Vector3.forward, orbitSpeed * Time.deltaTime);

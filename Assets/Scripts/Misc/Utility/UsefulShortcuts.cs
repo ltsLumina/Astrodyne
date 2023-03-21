@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
@@ -27,16 +28,36 @@ internal static class UsefulShortcuts
     /// </summary>
 
     [Shortcut("Damage Player", KeyCode.F1), ContextMenu("Damage Player")]
-    static void DamagePlayer() => GameManager.Instance.player.CurrentHealth -= 10; // Damage the player by 10.
+    static void DamagePlayer()
+    {
+        // Damage the player by 10.
+        GameManager.Instance.Player.CurrentHealth -= 10;
+        Debug.Log("Player damaged.");
+    }
 
     [Shortcut("Heal Player", KeyCode.F2), ContextMenu("Heal Player")]
-    static void HealPlayer() => GameManager.Instance.player.CurrentHealth += 10; // Heal the player by 10.
+    static void HealPlayer()
+    {
+        // Heal the player by 10.
+        GameManager.Instance.Player.CurrentHealth += 10;
+        Debug.Log("Player healed.");
+    }
 
     [Shortcut("Kill Player", KeyCode.F3), ContextMenu("Kill Player")]
-    static void KillPlayer() => GameManager.Instance.player.CurrentHealth = 0; // Kill the player.
+    static void KillPlayer()
+    {
+        // Kill the player.
+        GameManager.Instance.Player.CurrentHealth = 0;
+        Debug.Log("Player killed.");
+    }
 
     [Shortcut("Reload Scene", KeyCode.F5), ContextMenu("Reload Scene")]
-    static void ReloadScene() => SceneManagerExtended.ReloadScene(); // Reload Scene
+    static void ReloadScene()
+    {
+        // Reload Scene
+        SceneManagerExtended.ReloadScene();
+        Debug.Log("Scene reloaded.");
+    }
 }
 
 internal static class UsefulMethods
@@ -46,14 +67,22 @@ internal static class UsefulMethods
     /// </summary>
     /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="action">The action or method to run.</param>
-    /// <param name="logInfo">Whether or not to debug the waiting message and the completion message.</param>
-    public static async void DoAfterDelay(Action action, float delayInSeconds, bool logInfo)
+    /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
+    public static async Task DoAfterDelay(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
     {
-        if (logInfo) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
+        if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
         var timeSpan = TimeSpan.FromSeconds(delayInSeconds);
-        await Task.Delay(timeSpan);
+        try
+        {
+            await Task.Delay(timeSpan, cancellationToken);
+        }
+        catch (TaskCanceledException)
+        {
+            if (debugLog) Debug.Log("Action cancelled.");
+            return;
+        }
         action();
-        if (logInfo) Debug.Log("Action completed.");
+        if (debugLog) Debug.Log("Action completed.");
 
     }
 }
