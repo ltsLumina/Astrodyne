@@ -26,11 +26,10 @@ public class Weapon : MonoBehaviour
 
     void Start()
     {
-        cam        = Camera.main;
-        playerPos  = FindObjectOfType<Player>().transform;
-        player     = FindObjectOfType<Player>();
-        bulletPool = FindObjectOfType<ObjectPool>();
-
+        cam               = Camera.main;
+        playerPos         = FindObjectOfType<Player>().transform;
+        player            = FindObjectOfType<Player>();
+        bulletPool        = FindObjectOfType<ObjectPool>();
         cancellationToken = new CancellationTokenSource();
 
         // Assertions:
@@ -88,6 +87,8 @@ public class Weapon : MonoBehaviour
             pooledBullet.transform.position = transform.position;
             pooledBullet.transform.rotation = transform.rotation;
 
+            DoAfterDelayAsync(() => pooledBullet.SetActive(false), bulletLifetime);
+
             // Add force to the bullet.
             Rigidbody2D bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
             bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
@@ -96,7 +97,9 @@ public class Weapon : MonoBehaviour
             timeSinceLastShot = 0;
 
             // Return the bullet to the pool after bulletLifetime seconds.
-            _= DoAfterDelayAsync( () => pooledBullet.SetActive(false), bulletLifetime);
+            _= DoAfterDelayAsync(() => pooledBullet.SetActive(false), bulletLifetime, false, cancellationToken.Token);
+            cancellationToken.Cancel();
+            Log("Returned Bullet to Pool.");
         }
     }
 }

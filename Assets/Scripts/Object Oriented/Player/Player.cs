@@ -135,8 +135,8 @@ public class Player : MonoBehaviour
 
                 // Close the curtains and wait 2 seconds before loading the game over scene.
                 _= DoAfterDelayAsync(() => transition.CloseCurtains(), 2, true);
+
             }
         }
     }
-
 }

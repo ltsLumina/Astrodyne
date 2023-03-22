@@ -69,13 +69,13 @@ internal static class UsefulMethods
     /// UNLESS it is called at the very end of the method, where you can discard ( _= ) the task.
     /// <example> _= DoAfterDelayAsync( () => action(), delayInSeconds);  </example>
     /// </summary>
-    /// <param name="action">The action or method to run.</param>
+    /// <param name="action">The action or method to run. Use delegate lambda " () => " to run. </param>
     /// <param name="delayInSeconds">The delay before running the method.</param>
-    /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
-    /// <param name="cancellationToken">Cancellation Token for cancelling the currently running task. </param>
+    /// <param name="debugLog">Whether or not to debug the waiting message.</param>
+    /// <param name="cancellationToken">Cancellation Token for cancelling the currently running task. Not required. </param>
     public static async Task DoAfterDelayAsync(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
     {
-        if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
+        if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
         var timeSpan = TimeSpan.FromSeconds(delayInSeconds);
         try
         {
