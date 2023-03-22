@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
@@ -61,31 +62,21 @@ internal static class UsefulShortcuts
 #endif
 }
 
-internal static class UsefulMethods
+public static class UsefulMethods
 {
     /// <summary>
-    /// Allows you to call a method after a delay through the use of an asynchronous operation.
-    /// Keep in mind, that the method using this method needs to be an asynchronous method as well
-    /// UNLESS it is called at the very end of the method, where you can discard ( _= ) the task.
-    /// <example> _= DoAfterDelayAsync( () => action(), delayInSeconds);  </example>
-    /// </summary>
+    /// Allows you to call a method after a delay through the use of an asynchronous operation. </summary>
+    /// <example> DoAfterDelayAsync(() => action(), delayInSeconds, debugLog, cancellationToken).AsTask(); </example>
+    /// <remarks> To run a method after the task is completed: Task delayTask = delayTask.ContinueWith(_ => action();</remarks>
     /// <param name="action">The action or method to run. Use delegate lambda " () => " to run. </param>
     /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="debugLog">Whether or not to debug the waiting message.</param>
-    /// <param name="cancellationToken">Cancellation Token for cancelling the currently running task. Not required. </param>
-    public static async Task DoAfterDelayAsync(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
+    /// <param name="cancellationToken"> Token for cancelling the currently running task. Not required. </param>
+    public static async UniTask DoAfterDelayAsync(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
     {
         if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
         var timeSpan = TimeSpan.FromSeconds(delayInSeconds);
-        try
-        {
-            await Task.Delay(timeSpan, cancellationToken);
-        }
-        catch (TaskCanceledException)
-        {
-            if (debugLog) Debug.Log("Action cancelled.");
-            return;
-        }
+        await UniTask.Delay(timeSpan, cancellationToken: cancellationToken);
         action();
         if (debugLog) Debug.Log("Action completed.");
     }
@@ -99,6 +90,7 @@ internal static class UsefulMethods
     /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
     /// <param name="onComplete">An action to be completed after the initial action is finished. Not required to be used.</param>
+    [Obsolete("This method is not finished or has been deprecated. Use 'DoAfterDelayAsync' instead.")]
     public static void DoAfterDelay(Action action, float delayInSeconds, bool debugLog = false, Action onComplete = null)
     {
         if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");

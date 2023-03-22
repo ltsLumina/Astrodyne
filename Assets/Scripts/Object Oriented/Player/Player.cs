@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Debug;
 using static UsefulMethods;
@@ -134,7 +132,8 @@ public class Player : MonoBehaviour
                 RB.constraints = RigidbodyConstraints2D.FreezeAll;
 
                 // Close the curtains and wait 2 seconds before loading the game over scene.
-                _= DoAfterDelayAsync(() => transition.CloseCurtains(), 2, true);
+                var delayTask = DoAfterDelayAsync(() => transition.CloseCurtains(), 2, true).AsTask();
+                delayTask.ContinueWith(_ => Log("Closing Curtains..."));
 
             }
         }

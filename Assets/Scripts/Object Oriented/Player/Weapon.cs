@@ -1,6 +1,5 @@
-using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Debug;
 using static UsefulMethods;
@@ -87,19 +86,18 @@ public class Weapon : MonoBehaviour
             pooledBullet.transform.position = transform.position;
             pooledBullet.transform.rotation = transform.rotation;
 
-            DoAfterDelayAsync(() => pooledBullet.SetActive(false), bulletLifetime);
-
             // Add force to the bullet.
             Rigidbody2D bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
             bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
 
+            // Return the bullet to the pool after bulletLifetime seconds.
+            var delayTask = DoAfterDelayAsync(() => pooledBullet.SetActive(false), bulletLifetime, false, cancellationToken.Token).AsTask();
+            delayTask.ContinueWith(_ => Log("Bullet returned to pool!"));
+
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
+            Log("timeSinceLastShot reset!");
 
-            // Return the bullet to the pool after bulletLifetime seconds.
-            _= DoAfterDelayAsync(() => pooledBullet.SetActive(false), bulletLifetime, false, cancellationToken.Token);
-            cancellationToken.Cancel();
-            Log("Returned Bullet to Pool.");
         }
     }
 }
