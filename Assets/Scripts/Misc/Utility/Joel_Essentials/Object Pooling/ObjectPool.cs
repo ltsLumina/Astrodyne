@@ -7,7 +7,7 @@ public class ObjectPool : MonoBehaviour
     [SerializeField] GameObject objectPrefab;
     [SerializeField] int startAmount;
 
-    readonly static List<GameObject> pooledObjects = new List<GameObject>();
+    readonly static List<GameObject> pooledObjects = new ();
 
     void Awake()
     {

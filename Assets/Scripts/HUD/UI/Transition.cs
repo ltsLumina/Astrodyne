@@ -3,7 +3,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 
 /// <summary>
-/// TODO: I want to make this inherit from the Singleton class, but that caused an error outside of runtime.
+/// //TODO: Write a summary.
 /// </summary>
 public class Transition : SingletonPersistent<Transition>
 {

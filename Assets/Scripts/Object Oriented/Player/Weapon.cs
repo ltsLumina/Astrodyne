@@ -12,6 +12,7 @@ public class Weapon : MonoBehaviour
     Transform playerPos;
     Player player;
     ObjectPool bulletPool;
+
     CancellationTokenSource cancellationToken;
 
     [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon."), ReadOnly]
@@ -91,13 +92,12 @@ public class Weapon : MonoBehaviour
             bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
 
             // Return the bullet to the pool after bulletLifetime seconds.
-            var delayTask = DoAfterDelayAsync(() => pooledBullet.SetActive(false), bulletLifetime, false, cancellationToken.Token).AsTask();
+            var delayTask = DelayTaskAsync(() => pooledBullet.SetActive(false), bulletLifetime).AsTask();
             delayTask.ContinueWith(_ => Log("Bullet returned to pool!"));
 
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
             Log("timeSinceLastShot reset!");
-
         }
     }
 }

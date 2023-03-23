@@ -1,13 +1,12 @@
 #region
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 #endregion
 
 public static class ObjectPoolManager
 {
-    readonly static List<ObjectPool> objectPools = new List<ObjectPool>();
+    readonly static List<ObjectPool> objectPools = new ();
 
     static Transform objectPoolParent;
 
@@ -54,8 +53,10 @@ public static class ObjectPoolManager
     /// <returns></returns>
     public static ObjectPool FindObjectPool(GameObject objectPrefab)
     {
-        foreach (ObjectPool objectPool in objectPools.Where(objectPool => objectPool.GetPooledObjectPrefab() == objectPrefab))
+        var objectPool = objectPools.FirstOrDefault();
+        if (objectPool != null)
         {
+            Debug.Log("Found the pool!");
             return objectPool;
         }
 

@@ -72,7 +72,7 @@ public static class UsefulMethods
     /// <param name="delayInSeconds">The delay before running the method.</param>
     /// <param name="debugLog">Whether or not to debug the waiting message.</param>
     /// <param name="cancellationToken"> Token for cancelling the currently running task. Not required. </param>
-    public static async UniTask DoAfterDelayAsync(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
+    public static async UniTask DelayTaskAsync(Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
     {
         if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
         var timeSpan = TimeSpan.FromSeconds(delayInSeconds);

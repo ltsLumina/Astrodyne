@@ -1,9 +1,12 @@
+#region
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Debug;
 using static UsefulMethods;
+#endregion
 
-[RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
+[RequireComponent(typeof(Rigidbody2D))] [RequireComponent(typeof(CapsuleCollider2D))]
 public class Player : MonoBehaviour
 {
     #region Serialized Fields
@@ -14,6 +17,8 @@ public class Player : MonoBehaviour
     Camera cam;
     SpriteRenderer sr;
     Transition transition;
+
+    SpriteRenderer spriteRenderer;
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 5f;
@@ -68,7 +73,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// Player logic is handled entirely in this method where each part of the logic is split into its own local function.
+    ///     Player logic is handled entirely in this method where each part of the logic is split into its own local function.
     /// </summary>
     void PlayerLogic()
     {
@@ -86,7 +91,7 @@ public class Player : MonoBehaviour
         Movement();
 
         void Movement()
-        {   // Movement: WASD or Arrow Keys
+        { // Movement: WASD or Arrow Keys
             // Moves the player by getting their input and multiplying it by the move speed.
             // Gives the movement an acceleration/deceleration feel.
             float x = Input.GetAxis("Horizontal");
@@ -132,9 +137,8 @@ public class Player : MonoBehaviour
                 RB.constraints = RigidbodyConstraints2D.FreezeAll;
 
                 // Close the curtains and wait 2 seconds before loading the game over scene.
-                var delayTask = DoAfterDelayAsync(() => transition.CloseCurtains(), 2, true).AsTask();
+                var delayTask = DelayTaskAsync(() => transition.CloseCurtains(), 2, true).AsTask();
                 delayTask.ContinueWith(_ => Log("Closing Curtains..."));
-
             }
         }
     }

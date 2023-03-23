@@ -4,9 +4,7 @@ using UnityEngine;
 public class Crosshair : MonoBehaviour
 {
     // Get the mouse position.
-    Vector2 mousePos;
     Camera cam;
-    Player boundaries;
 
     void Start()
     {
@@ -21,7 +19,7 @@ public class Crosshair : MonoBehaviour
 
     void FollowCursor()
     {
-        mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
         transform.position = mousePos;
     }
 }
