@@ -9,8 +9,8 @@ public class Transition : SingletonPersistent<Transition>
 {
     [SerializeField] Animator animLeft;
     [SerializeField] Animator animRight;
-    readonly static int FadeRight = Animator.StringToHash("Fade Right");
-    readonly static int FadeLeft = Animator.StringToHash("Fade Left");
+    readonly static int fadeRight = Animator.StringToHash("Fade Right");
+    readonly static int fadeLeft = Animator.StringToHash("Fade Left");
 
     bool curtainsClosed;
 
@@ -24,15 +24,15 @@ public class Transition : SingletonPersistent<Transition>
     {
         if (curtainsClosed) return;
         curtainsClosed = !curtainsClosed;
-        animRight.SetBool(FadeRight, true);
-        animLeft.SetBool(FadeLeft, true);
+        animRight.SetBool(fadeRight, true);
+        animLeft.SetBool(fadeLeft, true);
     }
 
     public void OpenCurtains()
     {
         if (!curtainsClosed) return;
         curtainsClosed = !curtainsClosed;
-        animRight.SetBool(FadeRight, false);
-        animLeft.SetBool(FadeLeft, false);
+        animRight.SetBool(fadeRight, false);
+        animLeft.SetBool(fadeLeft, false);
     }
 }

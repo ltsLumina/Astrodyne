@@ -2,7 +2,8 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Debug;
-using static UsefulMethods;
+using static Essentials.UsefulMethods;
+using ReadOnly = Essentials.ReadOnlyAttribute;
 
 public class Weapon : MonoBehaviour
 {
@@ -92,12 +93,11 @@ public class Weapon : MonoBehaviour
             bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
 
             // Return the bullet to the pool after bulletLifetime seconds.
-            var delayTask = DelayTaskAsync(() => pooledBullet.SetActive(false), bulletLifetime).AsTask();
+            var delayTask = DelayedTaskAsync(() => pooledBullet.SetActive(false), bulletLifetime).AsTask();
             delayTask.ContinueWith(_ => Log("Bullet returned to pool!"));
 
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
-            Log("timeSinceLastShot reset!");
         }
     }
 }

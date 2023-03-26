@@ -1,4 +1,7 @@
+using System;
+using TMPro;
 using UnityEngine;
+using ReadOnly = Essentials.ReadOnlyAttribute;
 
 public class GameManager : SingletonPersistent<GameManager>
 {
@@ -8,10 +11,7 @@ public class GameManager : SingletonPersistent<GameManager>
     [Header("Score")]
     [ReadOnly, SerializeField] int score;
 
-    void Start()
-    {
-        Player  = FindObjectOfType<Player>();
-    }
+    void Start() => Player  = FindObjectOfType<Player>();
 
     /// <summary>
     /// Game Manager versions of the LoadNextScene and QuitGame methods to be used in conjunction with the OnClick method in the Unity Editor.

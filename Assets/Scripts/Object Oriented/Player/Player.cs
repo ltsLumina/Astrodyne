@@ -1,9 +1,8 @@
 #region
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Debug;
-using static UsefulMethods;
+using static Essentials.UsefulMethods;
 #endregion
 
 [RequireComponent(typeof(Rigidbody2D))] [RequireComponent(typeof(CapsuleCollider2D))]
@@ -50,7 +49,11 @@ public class Player : MonoBehaviour
     public float CurrentHealth
     {
         get => currentHealth;
-        set => currentHealth = value;
+        set
+        {
+            currentHealth = value;
+            IsDead = currentHealth <= 0;
+        }
     }
 
     public bool IsDead { get; private set; }
@@ -59,6 +62,9 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Randomize Spawn Position
+        transform.position = new (Random.Range(-30f, 7f), Random.Range(-3f, 15f), 0);
+
         cam        = Camera.main;
         RB         = GetComponent<Rigidbody2D>();
         collider   = GetComponent<CapsuleCollider2D>();
@@ -72,6 +78,7 @@ public class Player : MonoBehaviour
         if (!IsDead) PlayerLogic();
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     /// <summary>
     ///     Player logic is handled entirely in this method where each part of the logic is split into its own local function.
     /// </summary>
@@ -125,21 +132,19 @@ public class Player : MonoBehaviour
 
         void HealthLogic()
         {
-            IsDead = CurrentHealth <= 0;
-
-            // If the player's health is less than or equal to 0, then the player is dead.
+            // If the player is dead, run the HandleDeath method.
             if (IsDead) HandleDeath();
-
-            void HandleDeath()
-            {
-                // Debug that the player is dead and freeze their movement.
-                Log("Player is dead.");
-                RB.constraints = RigidbodyConstraints2D.FreezeAll;
-
-                // Close the curtains and wait 2 seconds before loading the game over scene.
-                var delayTask = DelayTaskAsync(() => transition.CloseCurtains(), 2, true).AsTask();
-                delayTask.ContinueWith(_ => Log("Closing Curtains..."));
-            }
         }
+
+        void HandleDeath()
+         {
+             // Debug that the player is dead and freeze their movement.
+             Log("Player is dead.");
+             RB.FreezeAllConstraints();
+
+             // Close the curtains and wait 2 seconds before loading the game over scene.
+             var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2, true).AsTask();
+             delayTask.ContinueWith(_ => Log("Closing Curtains..."));
+         }
     }
 }

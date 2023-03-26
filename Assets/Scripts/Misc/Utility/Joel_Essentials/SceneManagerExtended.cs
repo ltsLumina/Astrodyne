@@ -1,4 +1,5 @@
 #region
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 #endregion
@@ -38,7 +39,37 @@ public static class SceneManagerExtended
     /// <summary>
     ///     Loads the previously loaded scene.
     /// </summary>
-    public static void LoadPreviousScene() { SceneManager.LoadScene(ClampBuildIndex(previousScene)); }
+    public static void LoadPreviousScene() => SceneManager.LoadScene(ClampBuildIndex(previousScene));
+
+
+    /// <summary>
+    /// Asynchronously loads the scene with the specified build index.
+    /// </summary>
+    /// <param name="scene"></param>
+    /// <returns></returns>
+    public static IEnumerator LoadSceneAsync(int scene)
+    {
+        // Pause the game
+        Time.timeScale = 0f;
+
+        // Load the scene asynchronously
+        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(scene);
+
+        // Wait for the scene to finish loading
+        while (!asyncOperation.isDone) yield return null;
+
+        // Resume the game
+        Time.timeScale = 1f;
+    }
+
+    /// <summary>
+    /// Overload of LoadSceneAsync that loads the *next* scene according to the specified build index.
+    /// </summary>
+    public static IEnumerator LoadNextSceneAsync()
+    {
+        // Load the next scene asynchronously
+        yield return LoadSceneAsync(ClampBuildIndex(SceneManager.GetActiveScene().buildIndex + 1));
+    }
 
     /// <summary>
     ///     If the buildIndex is outside the range of build indexes, return 0.
