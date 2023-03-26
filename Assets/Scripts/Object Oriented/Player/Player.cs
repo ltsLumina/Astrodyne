@@ -1,6 +1,8 @@
 #region
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
+using static Essentials;
 using static UnityEngine.Debug;
 using static Essentials.UsefulMethods;
 #endregion
@@ -10,40 +12,33 @@ public class Player : MonoBehaviour
 {
     #region Serialized Fields
     [Header("Cached References")]
-    // ReSharper disable once InconsistentNaming
-    Rigidbody2D RB;
     new CapsuleCollider2D collider;
     Camera cam;
     SpriteRenderer sr;
     Transition transition;
-
     SpriteRenderer spriteRenderer;
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 5f;
-
+    [Space(5)]
+    [SerializeField] float dashCount = 3f;
     [SerializeField] float dashForce = 5f;
     [SerializeField] float dashDuration = 0.5f;
     [SerializeField] float dashCooldown = 1f;
 
-    [Header("Attacking")]
-    [SerializeField] float attackRange = 1f;
-    [SerializeField] float attackDamage = 1f;
-    [SerializeField] float attackCooldown = 1f;
-
-    [Header("Abilities")]
-    [SerializeField] float abilityRange = 1f;
-    [SerializeField] float abilityDamage = 1f;
-    [SerializeField] float abilityCooldown = 1f;
-    [SerializeField] float drawCooldown;
-
     [Header("Health")]
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float currentHealth = 100f;
+
+    //[Header("Read-only Fields")]
+    // [SerializeField, ReadOnly] float dashDurationTimer;
+    // [SerializeField, ReadOnly] float dashCooldownTimer;
+    [SerializeField]
     #endregion
 
     #region Properties
-    [field: Header("Configurable Variables")]
+    public Rigidbody2D RB { get; set; }
+
     public bool IsFacingRight { get; private set; } = true;
 
     public float CurrentHealth
@@ -75,6 +70,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Log($"Dash Cooldown: {dashCooldown}");
+        Log($"Dash Count: {dashCount}");
+
         if (!IsDead) PlayerLogic();
     }
 

@@ -83,8 +83,12 @@ public class Weapon : MonoBehaviour
             if (!Input.GetMouseButton(0) || !(timeSinceLastShot > fireRate)) return;
             if (bulletPool == null) return;
 
-            // Get a bullet from the object pool.
-            GameObject pooledBullet = bulletPool.GetPooledObject(true);
+            // Initialize the bullet before method call to to avoid closure allocation.
+            GameObject pooledBullet = bulletPool.GetPooledObject();
+            if (pooledBullet == null) return;
+
+            // Activate the bullet, and set its position and rotation.
+            pooledBullet = bulletPool.GetPooledObject(true);
             pooledBullet.transform.position = transform.position;
             pooledBullet.transform.rotation = transform.rotation;
 

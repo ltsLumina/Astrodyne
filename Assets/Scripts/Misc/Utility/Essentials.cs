@@ -7,12 +7,7 @@ using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
-#endregion
 
-/// <summary>
-///     An all-in-one class for useful methods and shortcuts.
-///     <remarks> Debugging shortcuts, useful methods, and a read-only attribute. </remarks>
-/// </summary>
 public static partial class Essentials
 {
     internal static class UsefulShortcuts
@@ -66,9 +61,9 @@ public static partial class Essentials
         [Shortcut("Clear Console", KeyCode.C, ShortcutModifiers.Alt)]
         public static void ClearConsole()
         {
-            Assembly   assembly = Assembly.GetAssembly(typeof(SceneView));
-            Type       type     = assembly.GetType("UnityEditor.LogEntries");
-            MethodInfo method   = type.GetMethod("Clear");
+            var assembly = Assembly.GetAssembly(typeof(SceneView));
+            var type     = assembly.GetType("UnityEditor.LogEntries");
+            var method   = type.GetMethod("Clear");
             method?.Invoke(new (), null);
         }
 
@@ -117,6 +112,7 @@ public static partial class Essentials
         }
     }
 }
+#endregion
 
 public static partial class Essentials
 {
