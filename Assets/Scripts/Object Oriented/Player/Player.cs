@@ -1,8 +1,7 @@
 #region
+using System.Collections;
 using Cysharp.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-using static Essentials;
 using static UnityEngine.Debug;
 using static Essentials.UsefulMethods;
 #endregion
@@ -17,30 +16,20 @@ public class Player : MonoBehaviour
     SpriteRenderer sr;
     Transition transition;
     SpriteRenderer spriteRenderer;
+    Dash dashComponent;
+    Vector2 moveInput;
 
-    [Header("Movement")]
+    [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
-    [Space(5)]
-    [SerializeField] float dashCount = 3f;
-    [SerializeField] float dashForce = 5f;
-    [SerializeField] float dashDuration = 0.5f;
-    [SerializeField] float dashCooldown = 1f;
 
-    [Header("Health")]
+    [Header("Health"), Space(5)]
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float currentHealth = 100f;
-
-    //[Header("Read-only Fields")]
-    // [SerializeField, ReadOnly] float dashDurationTimer;
-    // [SerializeField, ReadOnly] float dashCooldownTimer;
-    [SerializeField]
     #endregion
 
     #region Properties
     public Rigidbody2D RB { get; set; }
-
     public bool IsFacingRight { get; private set; } = true;
-
     public float CurrentHealth
     {
         get => currentHealth;
@@ -48,10 +37,12 @@ public class Player : MonoBehaviour
         {
             currentHealth = value;
             IsDead = currentHealth <= 0;
+            if (IsDead) HandleDeath();
         }
     }
-
     public bool IsDead { get; private set; }
+    public float LastPressedDashTime { get; set; }
+    float inputBufferTime = 1.5f;
     #endregion
 
     // Start is called before the first frame update
@@ -60,20 +51,53 @@ public class Player : MonoBehaviour
         // Randomize Spawn Position
         transform.position = new (Random.Range(-30f, 7f), Random.Range(-3f, 15f), 0);
 
-        cam        = Camera.main;
-        RB         = GetComponent<Rigidbody2D>();
-        collider   = GetComponent<CapsuleCollider2D>();
-        sr         = GetComponentInChildren<SpriteRenderer>();
-        transition = FindObjectOfType<Transition>();
+        cam           = Camera.main;
+        RB            = GetComponent<Rigidbody2D>();
+        collider      = GetComponent<CapsuleCollider2D>();
+        sr            = GetComponentInChildren<SpriteRenderer>();
+        transition    = FindObjectOfType<Transition>();
+        dashComponent = GetComponent<Dash>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Log($"Dash Cooldown: {dashCooldown}");
-        Log($"Dash Count: {dashCount}");
-
         if (!IsDead) PlayerLogic();
+        LastPressedDashTime -= Time.deltaTime;
+
+        Log(LastPressedDashTime);
+        Log(dashComponent.CanDash());
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            LastPressedDashTime = inputBufferTime;
+        }
+
+        if (dashComponent.CanDash() && LastPressedDashTime > 0)
+        {
+            //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
+            //Sleep(dashComponent.dashSleepTime);
+
+            dashComponent.IsDashing = true;
+
+            Log("Dashing!");
+            StartCoroutine(nameof(dashComponent.StartDash), moveInput);
+        }
+    }
+
+    void Sleep(float duration)
+    {
+        //Method used so we don't need to call StartCoroutine everywhere
+        //nameof() notation means we don't need to input a string directly.
+        //Removes chance of spelling mistakes and will improve error messages if any
+        StartCoroutine(nameof(PerformSleep), duration);
+    }
+
+    IEnumerator PerformSleep(float duration)
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(duration); //Must be Realtime since timeScale with be 0
+        Time.timeScale = 1;
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
@@ -83,6 +107,9 @@ public class Player : MonoBehaviour
     void PlayerLogic()
     {
         Boundaries();
+        Movement();
+        FaceMouse();
+        HealthLogic();
 
         void Boundaries()
         {
@@ -93,18 +120,14 @@ public class Player : MonoBehaviour
             transform.position = cam.ViewportToWorldPoint(viewPos);
         }
 
-        Movement();
-
         void Movement()
         { // Movement: WASD or Arrow Keys
             // Moves the player by getting their input and multiplying it by the move speed.
             // Gives the movement an acceleration/deceleration feel.
-            float x = Input.GetAxis("Horizontal");
-            float y = Input.GetAxis("Vertical");
-            RB.velocity = new Vector2(x, y) * moveSpeed;
+            moveInput.x = Input.GetAxis("Horizontal");
+            moveInput.y = Input.GetAxis("Vertical");
+            RB.velocity = new Vector2(moveInput.x, moveInput.y) * moveSpeed;
         }
-
-        FaceMouse();
 
         void FaceMouse()
         {
@@ -126,23 +149,20 @@ public class Player : MonoBehaviour
             }
         }
 
-        HealthLogic();
-
         void HealthLogic()
         {
-            // If the player is dead, run the HandleDeath method.
-            if (IsDead) HandleDeath();
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         }
+    }
 
-        void HandleDeath()
-         {
-             // Debug that the player is dead and freeze their movement.
-             Log("Player is dead.");
-             RB.FreezeAllConstraints();
+    void HandleDeath()
+    {
+        // Debug that the player is dead and freeze their movement.
+        Log("Player is dead.");
+        RB.FreezeAllConstraints();
 
-             // Close the curtains and wait 2 seconds before loading the game over scene.
-             var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2, true).AsTask();
-             delayTask.ContinueWith(_ => Log("Closing Curtains..."));
-         }
+        // Close the curtains and wait 2 seconds before loading the game over scene.
+        var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2, true).AsTask();
+        delayTask.ContinueWith(_ => Log("Closing Curtains..."));
     }
 }

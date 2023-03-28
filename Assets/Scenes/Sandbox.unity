@@ -500,6 +500,7 @@ GameObject:
   m_Component:
   - component: {fileID: 431302118}
   - component: {fileID: 431302119}
+  - component: {fileID: 431302122}
   - component: {fileID: 431302121}
   - component: {fileID: 431302120}
   m_Layer: 0
@@ -540,13 +541,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  dashForce: 25
-  dashDuration: 0.5
-  dashCooldown: 1
   maxHealth: 100
   currentHealth: 100
-  dashTimer: 0
-  dashCooldownTimer: 0
 --- !u!70 &431302120
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -609,6 +605,27 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &431302122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431302117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b80b9857ddfa384cb55dbf810746139, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashCount: 3
+  dashSpeed: 10
+  dashEndSpeed: 15
+  dashMaxCount: 3
+  dashRefilling: 0
+  dashRefillTime: 1.5
+  dashEndTime: 10
+  dashAttackTime: 1
+  dashSleepTime: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
