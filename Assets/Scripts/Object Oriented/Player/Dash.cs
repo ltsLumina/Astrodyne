@@ -65,10 +65,14 @@ public class Dash : MonoBehaviour
                     //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
                     Sleep(dashSleepTime); // Implement this once there are more visual effects to the dash.
 
-                if (player.moveInput != Vector2.zero) { StartCoroutine(nameof(StartDash), player.moveInput); }
+                if (player.moveInput != Vector2.zero)
+                {
+                    StartCoroutine(nameof(StartDash), player.moveInput);
+                }
                 else
                 {
-                    Log("Can't dash; standing still. (No input)");
+                    //TODO: Find a different way to handle the failed dash. This is a bit of a hack.
+                    Log("Standing still, dashing to mouse position.");
                     StartCoroutine(nameof(StartDash), mousePos);
                 }
             }
@@ -88,8 +92,6 @@ public class Dash : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Space))
                 DashRoutine();
-
-            //TODO: Find a different way to handle the failed dash. This is a bit of a hack.
         }
     }
 
