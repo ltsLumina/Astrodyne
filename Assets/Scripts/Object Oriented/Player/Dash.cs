@@ -6,11 +6,10 @@ using static UnityEngine.Debug;
 public class Dash : MonoBehaviour
 {
     Player player;
-    float buttonCooldown = 0.5f; // Half a second before reset
-    int buttonCount = 0;
-    string lastKeyPressed;
+    const float doubleClickTime = 0.2f;
+    float keyCooldown;
 
-              [Header("Dash"), Space(5)]
+    [Header("Dash"), Space(5)]
     [SerializeField] int dashCount;
     [SerializeField] float dashSpeed;
     [SerializeField] Vector2 dashEndSpeed;
@@ -51,47 +50,31 @@ public class Dash : MonoBehaviour
     {
         LastPressedDashTime -= Time.deltaTime;
 
-        PerformDash();
+        //TODO: implement double tap to dash.
 
-        void PerformDash()
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Space))
+            DashRoutine();
+
+        void DashRoutine() //TODO: refactor.
         {
-            void DashRoutine()
+            LastPressedDashTime = inputBufferTime;
+
+            mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+
+            if (CanDash() && LastPressedDashTime > 0)
+                //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
+                Sleep(dashSleepTime); // Implement this once there are more visual effects to the dash.
+
+            if (player.moveInput != Vector2.zero)
             {
-                LastPressedDashTime = inputBufferTime;
-
-                mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-
-                if (CanDash() && LastPressedDashTime > 0)
-                    //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
-                    Sleep(dashSleepTime); // Implement this once there are more visual effects to the dash.
-
-                if (player.moveInput != Vector2.zero)
-                {
-                    StartCoroutine(nameof(StartDash), player.moveInput);
-                }
-                else
-                {
-                    //TODO: Find a different way to handle the failed dash. This is a bit of a hack.
-                    Log("Standing still, dashing to mouse position.");
-                    StartCoroutine(nameof(StartDash), mousePos);
-                }
+                StartCoroutine(nameof(StartDash), player.moveInput);
             }
-
-            if (Input.anyKeyDown) //TODO: a bug occurs here if you press two different keys, it counts as double tapping and proceeds to dash.
+            else
             {
-                if (buttonCooldown > 0 && buttonCount == 1 /*Number of Taps you want Minus One*/) { DashRoutine(); }
-                else
-                {
-                    buttonCooldown =  0.5f;
-                    buttonCount    += 1;
-                }
+                //TODO: Find a different way to handle the failed dash. This is a bit of a hack.
+                Log("Standing still, dashing to mouse position.");
+                StartCoroutine(nameof(StartDash), mousePos);
             }
-
-            if (buttonCooldown > 0) buttonCooldown -= 1 * Time.deltaTime;
-            else buttonCount =  0;
-
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Space))
-                DashRoutine();
         }
     }
 
