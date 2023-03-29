@@ -1,12 +1,12 @@
 #region
-using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using static Essentials;
 using static UnityEngine.Debug;
 using static Essentials.UsefulMethods;
 #endregion
 
-[RequireComponent(typeof(Rigidbody2D))] [RequireComponent(typeof(CapsuleCollider2D))]
+[RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
 public class Player : MonoBehaviour
 {
     #region Serialized Fields
@@ -16,11 +16,14 @@ public class Player : MonoBehaviour
     SpriteRenderer sr;
     Transition transition;
     SpriteRenderer spriteRenderer;
-    Dash dashComponent;
-    Vector2 moveInput;
+
+    // Turn into property eventually.
 
     [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
+    [ReadOnly] public Vector2 moveInput;
+
+    [Space(15)]
 
     [Header("Health"), Space(5)]
     [SerializeField] float maxHealth = 100f;
@@ -41,8 +44,6 @@ public class Player : MonoBehaviour
         }
     }
     public bool IsDead { get; private set; }
-    public float LastPressedDashTime { get; set; }
-    float inputBufferTime = 1.5f;
     #endregion
 
     // Start is called before the first frame update
@@ -56,48 +57,12 @@ public class Player : MonoBehaviour
         collider      = GetComponent<CapsuleCollider2D>();
         sr            = GetComponentInChildren<SpriteRenderer>();
         transition    = FindObjectOfType<Transition>();
-        dashComponent = GetComponent<Dash>();
     }
 
     // Update is called once per frame
     void Update()
     {
         if (!IsDead) PlayerLogic();
-        LastPressedDashTime -= Time.deltaTime;
-
-        Log(LastPressedDashTime);
-        Log(dashComponent.CanDash());
-
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            LastPressedDashTime = inputBufferTime;
-        }
-
-        if (dashComponent.CanDash() && LastPressedDashTime > 0)
-        {
-            //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
-            //Sleep(dashComponent.dashSleepTime);
-
-            dashComponent.IsDashing = true;
-
-            Log("Dashing!");
-            StartCoroutine(nameof(dashComponent.StartDash), moveInput);
-        }
-    }
-
-    void Sleep(float duration)
-    {
-        //Method used so we don't need to call StartCoroutine everywhere
-        //nameof() notation means we don't need to input a string directly.
-        //Removes chance of spelling mistakes and will improve error messages if any
-        StartCoroutine(nameof(PerformSleep), duration);
-    }
-
-    IEnumerator PerformSleep(float duration)
-    {
-        Time.timeScale = 0;
-        yield return new WaitForSecondsRealtime(duration); //Must be Realtime since timeScale with be 0
-        Time.timeScale = 1;
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
