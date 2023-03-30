@@ -5,9 +5,11 @@ using static UnityEngine.Debug;
 
 public class Dash : MonoBehaviour
 {
+    [Header("Cached References")]
     Player player;
-    const float doubleClickTime = 0.2f;
-    float keyCooldown;
+    Camera cam;
+    bool doubleTap;
+    float doubleTapTime;
 
     [Header("Dash"), Space(5)]
     [SerializeField] int dashCount;
@@ -26,8 +28,6 @@ public class Dash : MonoBehaviour
     [Header("Read-only Fields")]
     [SerializeField, ReadOnly] float lastPressedDashTime;
     [SerializeField, ReadOnly] bool isDashing;
-    Camera cam;
-    Vector2 mousePos;
 
     public bool IsDashing
     {
@@ -42,16 +42,16 @@ public class Dash : MonoBehaviour
 
     void Awake()
     {
-        player = GetComponent<Player>();
-        cam    = Camera.main;
+        player         = GetComponent<Player>();
+        cam            = Camera.main;
     }
 
     void Update()
     {
         LastPressedDashTime -= Time.deltaTime;
 
-        //TODO: implement double tap to dash.
-
+        DoubleTap();
+        
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Space))
             DashRoutine();
 
@@ -59,25 +59,54 @@ public class Dash : MonoBehaviour
         {
             LastPressedDashTime = inputBufferTime;
 
-            mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+            Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
 
             if (CanDash() && LastPressedDashTime > 0)
                 //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
                 Sleep(dashSleepTime); // Implement this once there are more visual effects to the dash.
 
-            if (player.moveInput != Vector2.zero)
-            {
-                StartCoroutine(nameof(StartDash), player.moveInput);
-            }
-            else
-            {
-                //TODO: Find a different way to handle the failed dash. This is a bit of a hack.
-                Log("Standing still, dashing to mouse position.");
-                StartCoroutine(nameof(StartDash), mousePos);
-            }
+            //TODO: Find a different way to handle the failed dash. This is a bit of a hack.
+            StartCoroutine(nameof(StartDash), player.moveInput != Vector2.zero ? player.moveInput : mousePos);
         }
     }
 
+    void DoubleTap()
+    {
+        //TODO: switch-case
+
+        if (Input.GetKeyDown(KeyCode.W) && doubleTap)
+        {
+            if (Time.time - doubleTapTime < 0.4f)
+            {
+                Log("Double-tapped");
+                doubleTapTime = 0f;
+            }
+
+            doubleTap = false;
+        }
+
+        if (!Input.GetKeyDown(KeyCode.W) || doubleTap) return;
+        doubleTap     = true;
+        doubleTapTime = Time.time;
+
+        if (Input.GetKeyDown(KeyCode.S) && doubleTap)
+        {
+            if (Time.time - doubleTapTime < 0.4f)
+            {
+                Log("Double-tapped");
+                doubleTapTime = 0f;
+            }
+
+            doubleTap = false;
+        }
+
+        if (!Input.GetKeyDown(KeyCode.S) || doubleTap) return;
+        doubleTap     = true;
+        doubleTapTime = Time.time;
+
+    }
+
+    #region DASH METHODS
     IEnumerator StartDash(Vector2 dashDirection)
     {
         Log("Dash Start");
@@ -119,6 +148,7 @@ public class Dash : MonoBehaviour
         dashRefilling = false;
         dashCount     = Mathf.Min(dashAmount, dashCount + 1);
     }
+    #endregion
 
     #region DASH CHECKS
     //TODO: dash only refreshes to a maximum of one.
@@ -128,8 +158,10 @@ public class Dash : MonoBehaviour
             StartCoroutine(nameof(RefillDash), 1);
         return dashCount > 0;
     }
+    #endregion
 
-    void Sleep(float duration)
+    #region SLEEP METHOD
+    public void Sleep(float duration)
     {
         //Method used so we don't need to call StartCoroutine everywhere
         StartCoroutine(nameof(PerformSleep), duration);
