@@ -618,16 +618,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b80b9857ddfa384cb55dbf810746139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doubleTapTimeThreshold: 0.4
   dashCount: 3
   dashSpeed: 15
   dashEndSpeed: {x: 20, y: 20}
-  dashAmount: 3
+  dashMaxAmount: 3
   dashRefilling: 0
   dashRefillTime: 1
   dashEndTime: 0.15
   dashAttackTime: 0.15
   dashSleepTime: 0.05
-  inputBufferTime: 0.15
+  dashBufferTime: 1.44
   lastPressedDashTime: 0
   isDashing: 0
 --- !u!1 &519420028

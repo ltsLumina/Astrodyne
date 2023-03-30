@@ -17,15 +17,13 @@ public class Player : MonoBehaviour
     Transition transition;
     SpriteRenderer spriteRenderer;
 
-    // Turn into property eventually.
+    // Turn moveInput into property eventually.
 
     [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
     [ReadOnly] public Vector2 moveInput;
 
-    [Space(15)]
-
-    [Header("Health"), Space(5)]
+    [Header("Health"), Space(20)]
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float currentHealth = 100f;
     #endregion
@@ -39,7 +37,7 @@ public class Player : MonoBehaviour
         set
         {
             currentHealth = value;
-            IsDead = currentHealth <= 0;
+            IsDead        = currentHealth <= 0;
             if (IsDead) HandleDeath();
         }
     }
@@ -52,11 +50,11 @@ public class Player : MonoBehaviour
         // Randomize Spawn Position
         transform.position = new (Random.Range(-30f, 7f), Random.Range(-3f, 15f), 0);
 
-        cam           = Camera.main;
-        RB            = GetComponent<Rigidbody2D>();
-        collider      = GetComponent<CapsuleCollider2D>();
-        sr            = GetComponentInChildren<SpriteRenderer>();
-        transition    = FindObjectOfType<Transition>();
+        cam        = Camera.main;
+        RB         = GetComponent<Rigidbody2D>();
+        collider   = GetComponent<CapsuleCollider2D>();
+        sr         = GetComponentInChildren<SpriteRenderer>();
+        transition = FindObjectOfType<Transition>();
     }
 
     // Update is called once per frame

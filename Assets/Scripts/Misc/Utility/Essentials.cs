@@ -1,4 +1,5 @@
 ﻿#region
+#region
 using System;
 using System.Reflection;
 using System.Threading;
@@ -7,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
+#endregion
 
 public static partial class Essentials
 {
@@ -18,8 +20,8 @@ public static partial class Essentials
         ///     Note: These methods are local functions, and are only accessible within this method.
         /// </summary>
 
-#if UNITY_EDITOR
-        [Shortcut("Damage Player", KeyCode.F1)] [ContextMenu("Damage Player")]
+#if UNITY_EDITOR //!WARNING! This class is only accessible in the Unity Editor, and may cause errors when building the game.
+        [Shortcut("Damage Player", KeyCode.F1), ContextMenu("Damage Player")]
         static void DamagePlayer()
         {
             // Damage the player by 10.
@@ -27,7 +29,7 @@ public static partial class Essentials
             Debug.Log("Player damaged.");
         }
 
-        [Shortcut("Heal Player", KeyCode.F2)] [ContextMenu("Heal Player")]
+        [Shortcut("Heal Player", KeyCode.F2), ContextMenu("Heal Player")]
         static void HealPlayer()
         {
             // Heal the player by 10.
@@ -35,7 +37,7 @@ public static partial class Essentials
             Debug.Log("Player healed.");
         }
 
-        [Shortcut("Kill Player", KeyCode.F3)] [ContextMenu("Kill Player")]
+        [Shortcut("Kill Player", KeyCode.F3), ContextMenu("Kill Player")]
         static void KillPlayer()
         {
             // Kill the player.
@@ -43,7 +45,7 @@ public static partial class Essentials
             Debug.Log("Player killed.");
         }
 
-        [Shortcut("Reload Scene", KeyCode.F5)] [ContextMenu("Reload Scene")]
+        [Shortcut("Reload Scene", KeyCode.F5), ContextMenu("Reload Scene")]
         static void ReloadScene()
         {
             // Reload Scene
@@ -61,10 +63,10 @@ public static partial class Essentials
         [Shortcut("Clear Console", KeyCode.C, ShortcutModifiers.Alt)]
         public static void ClearConsole()
         {
-            var assembly = Assembly.GetAssembly(typeof(SceneView));
-            var type     = assembly.GetType("UnityEditor.LogEntries");
-            var method   = type.GetMethod("Clear");
-            method?.Invoke(new (), null);
+            var        assembly = Assembly.GetAssembly(typeof(SceneView));
+            Type       type     = assembly.GetType("UnityEditor.LogEntries");
+            MethodInfo method   = type.GetMethod("Clear");
+            method?.Invoke(new(), null);
         }
 
         /// <summary>
@@ -76,8 +78,8 @@ public static partial class Essentials
         /// <param name="delayInSeconds">The delay before running the method.</param>
         /// <param name="debugLog">Whether or not to debug the waiting message.</param>
         /// <param name="cancellationToken"> Token for cancelling the currently running task. Not required. </param>
-        internal static async UniTask DelayedTaskAsync
-            (Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
+        internal static async UniTask DelayedTaskAsync(
+            Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
         {
             if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
             TimeSpan timeSpan = TimeSpan.FromSeconds(delayInSeconds);
@@ -97,12 +99,13 @@ public static partial class Essentials
         /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
         /// <param name="onComplete">An action to be completed after the initial action is finished. Not required to be used.</param>
         [Obsolete("This method is not finished or has been deprecated. Use 'DoAfterDelayAsync' instead.")]
-        public static void DelayedTask
-            (Action action, int delayInSeconds, bool debugLog = false, Action onComplete = null)
+        public static void DelayedTask(
+            Action action, int delayInSeconds, bool debugLog = false, Action onComplete = null)
         {
             if (debugLog) Debug.Log("Waiting for " + delayInSeconds + " seconds...");
 
-            Task.Delay(delayInSeconds).ContinueWith(_ =>
+            Task.Delay(delayInSeconds).ContinueWith
+            (_ =>
             {
                 Thread.Sleep(delayInSeconds);
                 action();
