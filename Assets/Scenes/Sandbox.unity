@@ -541,9 +541,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  moveInput: {x: 0, y: 0}
   maxHealth: 100
   currentHealth: 100
+  moveInput: {x: 0, y: 0}
+  isDead: 0
 --- !u!70 &431302120
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -628,7 +629,7 @@ MonoBehaviour:
   dashEndTime: 0.15
   dashAttackTime: 0.15
   dashSleepTime: 0.05
-  dashBufferTime: 1.44
+  dashBufferTime: 0
   lastPressedDashTime: 0
   isDashing: 0
 --- !u!1 &519420028

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
@@ -34,13 +35,15 @@ public class PlayerAnimator : MonoBehaviour
         // Dash animation.
         // Shake screen, character trail, etc.
         if (dash.IsDashing)
-        {
             CameraShake.Instance.ShakeCamera(1.5f, 0.2f);
-        }
 
         // Death animation.
+    }
 
-        // Hurt animation. (flash red)
-        //sprite.color = new (255, 0, 0);
+    public IEnumerator DamageRoutine() //TODO: add invincibility frames and flash the player invisible.
+    {
+        sprite.color = new (255, 0, 0);
+        yield return new WaitForSeconds(0.1f);
+        sprite.color = new (255, 255, 255);
     }
 }

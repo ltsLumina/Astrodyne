@@ -7,10 +7,12 @@ using static UnityEngine.Debug;
 
 public class Dash : InputManager
 {
-    [Header("Cached References")] Player player;
+    [Header("Cached References")]
+    Player player;
     Camera cam;
 
-    [Header("Dash"), Space(5), SerializeField] int dashCount;
+    [Header("Dash"), Space(5), SerializeField]
+    int dashCount;
     [SerializeField] float dashSpeed;
     [SerializeField] Vector2 dashEndSpeed;
     [SerializeField] int dashMaxAmount;
@@ -24,7 +26,8 @@ public class Dash : InputManager
     [Space(5), SerializeField, Range(0.01f, 2f), Tooltip("The amount of time the player has to wait before dashing again. A higher value means the player can dash less often.")]
     float dashBufferTime;
 
-    [Header("Read-only Fields"), SerializeField, ReadOnly] float lastPressedDashTime;
+    [Header("Read-only Fields"), SerializeField, ReadOnly]
+    float lastPressedDashTime;
     [SerializeField, ReadOnly] bool isDashing;
 
     public bool IsDashing
@@ -53,7 +56,7 @@ public class Dash : InputManager
 
         // Check for dash input.
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.Space)) dashDirection = GetDashDirection();
-        else if (CheckDoubleTap()) dashDirection                                                  = InputDirection();
+        else if (CheckDoubleTap()) dashDirection = InputDirection();
 
         // If a dash direction was detected, start the dash routine.
         if (dashDirection != Vector2.zero) DashRoutine(dashDirection);
@@ -72,13 +75,13 @@ public class Dash : InputManager
         if (CanDash() && LastPressedDashTime <= 0 && !IsDashing)
         {
             IsDashing = true;
+            //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
             Sleep(dashSleepTime);
 
             // Run the dash coroutine.
             StartCoroutine(nameof(StartDash), dashDirection);
         }
 
-        //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
     }
 
     #region DASH METHODS
@@ -128,9 +131,10 @@ public class Dash : InputManager
     #endregion
 
     #region DASH CHECKS
-    public bool CanDash()
+    protected bool CanDash()
     {
-        if (!IsDashing && dashCount < dashMaxAmount && !dashRefilling) StartCoroutine(nameof(RefillDash), 1);
+        if (!IsDashing && dashCount < dashMaxAmount && !dashRefilling)
+            StartCoroutine(nameof(RefillDash), 1);
 
         return dashCount > 0;
     }

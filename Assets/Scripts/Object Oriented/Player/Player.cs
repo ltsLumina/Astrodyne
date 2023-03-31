@@ -13,35 +13,50 @@ public class Player : MonoBehaviour
     [Header("Cached References")]
     new CapsuleCollider2D collider;
     Camera cam;
-    SpriteRenderer sr;
+    SpriteRenderer sprite;
     Transition transition;
     SpriteRenderer spriteRenderer;
+    PlayerAnimator playerAnimator;
 
     // Turn moveInput into property eventually.
 
     [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
-    [ReadOnly] public Vector2 moveInput;
 
-    [Header("Health"), Space(20)]
-    [SerializeField] float maxHealth = 100f;
-    [SerializeField] float currentHealth = 100f;
+    [Header("Health"), Space(5)]
+    [SerializeField] int maxHealth = 100;
+    [SerializeField] int currentHealth = 100;
+
+    [Header("Read-only Fields")]
+    [ReadOnly] public Vector2 moveInput;
+    [Space(20), SerializeField, ReadOnly] bool isDead;
+
     #endregion
 
     #region Properties
-    public Rigidbody2D RB { get; set; }
+    public Rigidbody2D RB { get; private set; }
     public bool IsFacingRight { get; private set; } = true;
-    public float CurrentHealth
+    public int CurrentHealth
     {
         get => currentHealth;
         set
         {
             currentHealth = value;
-            IsDead        = currentHealth <= 0;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+            IsDead = currentHealth <= 0;
             if (IsDead) HandleDeath();
+
+            if (currentHealth < maxHealth) //TODO: this method runs even if the player is healed.
+                StartCoroutine(playerAnimator.DamageRoutine());
         }
     }
-    public bool IsDead { get; private set; }
+
+    public bool IsDead
+    {
+        get => isDead;
+        private set => isDead = value;
+    }
     #endregion
 
     // Start is called before the first frame update
@@ -50,11 +65,12 @@ public class Player : MonoBehaviour
         // Randomize Spawn Position
         transform.position = new (Random.Range(-30f, 7f), Random.Range(-3f, 15f), 0);
 
-        cam        = Camera.main;
-        RB         = GetComponent<Rigidbody2D>();
-        collider   = GetComponent<CapsuleCollider2D>();
-        sr         = GetComponentInChildren<SpriteRenderer>();
-        transition = FindObjectOfType<Transition>();
+        cam            = Camera.main;
+        RB             = GetComponent<Rigidbody2D>();
+        collider       = GetComponent<CapsuleCollider2D>();
+        sprite         = GetComponentInChildren<SpriteRenderer>();
+        playerAnimator = GetComponentInChildren<PlayerAnimator>();
+        transition     = FindObjectOfType<Transition>();
     }
 
     // Update is called once per frame
@@ -72,11 +88,9 @@ public class Player : MonoBehaviour
         Boundaries();
         Movement();
         FaceMouse();
-        HealthLogic();
 
         void Boundaries()
-        {
-            // Keeps the player within the camera's view.
+        { // Keeps the player within the camera's view.
             Vector3 viewPos = cam.WorldToViewportPoint(transform.position);
             viewPos.x          = Mathf.Clamp01(viewPos.x);
             viewPos.y          = Mathf.Clamp01(viewPos.y);
@@ -93,28 +107,22 @@ public class Player : MonoBehaviour
         }
 
         void FaceMouse()
-        {
-            // Smoothly rotates player to face mouse.
+        { // Smoothly rotates player to face mouse.
             Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
 
-            // flip the sprite if the mouse is on the left side of the player
+            // Flip the sprite if the mouse is on the left side of the player
             if (mousePos.x > transform.position.x)
             {
-                sr.flipX      = true;
+                sprite.flipX  = true;
                 IsFacingRight = false;
-                Assert(!IsFacingRight, "Facing Left");
+                Assert(!IsFacingRight, "Facing Left!");
             }
             else
             {
-                sr.flipX      = false;
+                sprite.flipX  = false;
                 IsFacingRight = true;
-                Assert(IsFacingRight, "Facing Right");
+                Assert(IsFacingRight, "Facing Right!");
             }
-        }
-
-        void HealthLogic()
-        {
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         }
     }
 
@@ -125,7 +133,7 @@ public class Player : MonoBehaviour
         RB.FreezeAllConstraints();
 
         // Close the curtains and wait 2 seconds before loading the game over scene.
-        var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2, true).AsTask();
-        delayTask.ContinueWith(_ => Log("Closing Curtains..."));
+        var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2).AsTask();
+        delayTask.ContinueWith(_ => Log("//TODO: Load Game Over Scene"));
     }
 }

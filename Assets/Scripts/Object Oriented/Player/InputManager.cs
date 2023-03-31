@@ -10,6 +10,7 @@ public abstract class InputManager : MonoBehaviour
     readonly List<KeyCode> doubleTapKeys = new () { KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D };
     readonly Dictionary<KeyCode, float> doubleTapTimers = new ();
 
+    //TODO: put this at the bottom of the serializedfields.
     [SerializeField] float doubleTapTimeThreshold = 0.4f;
 
     protected bool CheckDoubleTap()
