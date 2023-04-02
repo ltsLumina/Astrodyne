@@ -9,11 +9,9 @@ public class ObjectPool : MonoBehaviour
 
     readonly static List<GameObject> pooledObjects = new ();
 
-    void Awake()
-    {
+    void Awake() =>
         // Clearing the list of pooled objects in Awake in case the list is not empty when the game is restarted.
         pooledObjects.Clear();
-    }
 
     void Start()
     {

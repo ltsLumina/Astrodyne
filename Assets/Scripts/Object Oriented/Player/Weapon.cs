@@ -88,6 +88,7 @@ public class Weapon : MonoBehaviour
             if (pooledBullet == null) return;
 
             // Activate the bullet, and set its position and rotation.
+            pooledBullet.GetComponent<TrailRenderer>().Clear(); //TODO: Probably a bad idea calling GetComponent every time, but it works for now.
             pooledBullet = bulletPool.GetPooledObject(true);
             pooledBullet.transform.position = transform.position;
             pooledBullet.transform.rotation = transform.rotation;

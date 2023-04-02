@@ -26,8 +26,8 @@ public class Dash : InputManager
     [Space(5), SerializeField, Range(0.01f, 2f), Tooltip("The amount of time the player has to wait before dashing again. A higher value means the player can dash less often.")]
     float dashBufferTime;
 
-    [Header("Read-only Fields"), SerializeField, ReadOnly]
-    float lastPressedDashTime;
+    [Header("Read-only Fields")]
+    [SerializeField, ReadOnly] float lastPressedDashTime;
     [SerializeField, ReadOnly] bool isDashing;
 
     public bool IsDashing
@@ -88,6 +88,7 @@ public class Dash : InputManager
     IEnumerator StartDash(Vector2 dashDirection)
     {
         Log("Dashing!");
+        Vector2 originalVelocity = player.RB.velocity;
 
         LastPressedDashTime = dashBufferTime;
 
@@ -112,12 +113,38 @@ public class Dash : InputManager
         //isDashAttacking = false;
 
         //Begins the "end" of our dash where we return some control to the player but still limit run acceleration (see Update() and Run())
-        player.RB.velocity = dashEndSpeed * dashDirection.normalized;
+        while (Time.time - startTime <= dashEndTime)
+        {
+            // Get the current movement input
+            var moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        while (Time.time - startTime <= dashEndTime) yield return null;
+            // If the character is not moving, continue the loop
+            if (moveInput == Vector2.zero)
+            {
+                // Set the character's velocity to the dash direction multiplied by the dash end speed
+                player.RB.velocity = dashDirection.normalized * dashEndSpeed;
 
-        //Dash over
+                yield return null;
+                continue;
+            }
+
+            // Get the normalized movement input
+            Vector2 moveDirection = moveInput.normalized;
+
+            // Calculate the movement velocity while dashing
+            Vector2 dashVelocity = moveDirection * dashEndSpeed;
+
+            // Set the character's velocity to the dash velocity plus the original velocity
+            player.RB.velocity = dashDirection.normalized * dashSpeed + dashVelocity;
+
+            yield return null;
+        }
+
+        player.RB.velocity = originalVelocity;
+
+        //Dash finished.
         IsDashing = false;
+
     }
 
     //TODO: dash only refreshes to a maximum of one. This is a bug.

@@ -15,14 +15,14 @@ public class PlayerAnimator : MonoBehaviour
     void Awake()
     {
         player = GetComponentInParent<Player>();
-        anim   = GetComponentInChildren<Animator>();
         dash   = GetComponentInParent<Dash>();
+        anim   = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
-        HandleAnimationChange();
+        //HandleAnimationChange();
     }
 
     void HandleAnimationChange()

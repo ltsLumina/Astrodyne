@@ -26,10 +26,11 @@ public class Player : MonoBehaviour
     [Header("Health"), Space(5)]
     [SerializeField] int maxHealth = 100;
     [SerializeField] int currentHealth = 100;
+    int previousHealth;
 
     [Header("Read-only Fields")]
     [ReadOnly] public Vector2 moveInput;
-    [Space(20), SerializeField, ReadOnly] bool isDead;
+    [SerializeField, ReadOnly] bool isDead;
 
     #endregion
 
@@ -41,13 +42,14 @@ public class Player : MonoBehaviour
         get => currentHealth;
         set
         {
-            currentHealth = value;
-            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            previousHealth = currentHealth;
+            currentHealth  = value;
+            currentHealth  = Mathf.Clamp(currentHealth, 0, maxHealth);
 
             IsDead = currentHealth <= 0;
             if (IsDead) HandleDeath();
 
-            if (currentHealth < maxHealth) //TODO: this method runs even if the player is healed.
+            if (currentHealth < previousHealth) //TODO: this method runs even if the player is healed.
                 StartCoroutine(playerAnimator.DamageRoutine());
         }
     }
