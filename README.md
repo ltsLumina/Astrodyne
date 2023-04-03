@@ -10,7 +10,7 @@
 The player will be an [undecided] character who has the ability to draw magical cards that they can recieve buffs from, or alternatively use as a weapon to attack randomly spawning enemies.
 
 #### World: 
-At the time of writing, I am contemplating what kind of level system the world should consist of. Either in the shape of rooms with a fog-of-war system, shrouding the forthcoming enemies, or a more open world-esque design philosophy.
+The world will be comprised of smaller, individual rooms that lock behind when you enter, similar to Binding of Isaac. Once you enter you must kill the enemies that are inside, of which some rooms will spawn in enemies in waves. Once a room is cleared the player has a chance to be rewarded a upgrade card.
 
 ###
  
