@@ -30,7 +30,7 @@ public class CameraShake : MonoBehaviour
 
     /// <summary>
     /// Camera Shake for Cinemachine.
-    /// <remarks>Syntax: CameraShake.instance.ShakeCamera(1.5f, .2f);</remarks>
+    /// <remarks>Syntax: CameraShake.instance.ShakeCamera(1.5f, 0.2f);</remarks>
     /// </summary>
     /// <param name="intensity"></param>
     /// <param name="time"></param>

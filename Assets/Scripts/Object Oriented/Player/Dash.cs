@@ -81,7 +81,6 @@ public class Dash : InputManager
             // Run the dash coroutine.
             StartCoroutine(nameof(StartDash), dashDirection);
         }
-
     }
 
     #region DASH METHODS
@@ -116,10 +115,10 @@ public class Dash : InputManager
         while (Time.time - startTime <= dashEndTime)
         {
             // Get the current movement input
-            var moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
             // If the character is not moving, continue the loop
-            if (moveInput == Vector2.zero)
+            if (moveInput == Vector2.zero || moveInput != Vector2.zero)
             {
                 // Set the character's velocity to the dash direction multiplied by the dash end speed
                 player.RB.velocity = dashDirection.normalized * dashEndSpeed;

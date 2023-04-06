@@ -6,7 +6,7 @@ public class Astrodyne : MonoBehaviour
     [Header("Cached References")]
     Player player;
 
-    [Header("Point to rotate around."), Space(15)]
+    [Header("Point to rotate around.")]
     [SerializeField] Transform point;
 
     [Header("Configurable Variables"), Tooltip("The speed at which the weapon orbits around the player. \n (Degrees/Second)")]

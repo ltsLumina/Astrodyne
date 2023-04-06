@@ -10,7 +10,7 @@ using UnityEditor.ShortcutManagement;
 using UnityEngine;
 #endregion
 
-public static partial class Essentials
+internal static partial class Essentials
 {
     internal static class UsefulShortcuts
     {
@@ -117,7 +117,7 @@ public static partial class Essentials
 }
 #endregion
 
-public static partial class Essentials
+internal static partial class Essentials
 {
     public class ReadOnlyAttribute : PropertyAttribute
     {

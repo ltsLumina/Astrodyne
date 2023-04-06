@@ -3,24 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.KeyCode;
 #endregion
 
 public abstract class InputManager : MonoBehaviour
 {
-    readonly List<KeyCode> doubleTapKeys = new () { KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.D };
+    readonly List<KeyCode> doubleTapKeys = new ()
+    {
+        // W, A, S and D keys.
+        W, A, S, D
+        // UpArrow, LeftArrow, DownArrow and RightArrow keys.
+        , UpArrow, LeftArrow, DownArrow, RightArrow
+    };
     readonly Dictionary<KeyCode, float> doubleTapTimers = new ();
 
     //TODO: put this at the bottom of the serializedfields.
-    [SerializeField] float doubleTapTimeThreshold = 0.4f;
+    const float DOUBLE_TAP_TIME_THRESHOLD = 0.4f;
 
     protected bool CheckDoubleTap()
     {
-
         foreach (KeyCode key in doubleTapKeys.ToList().Where(Input.GetKeyDown))
         {
             if (!Input.GetKeyDown(key)) continue;
 
-            if (doubleTapTimers.ContainsKey(key) && Time.time - doubleTapTimers[key] < doubleTapTimeThreshold)
+            if (doubleTapTimers.ContainsKey(key) && Time.time - doubleTapTimers[key] < DOUBLE_TAP_TIME_THRESHOLD)
             {
                 doubleTapTimers[key] = -1f;
                 return true;

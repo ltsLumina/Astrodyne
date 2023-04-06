@@ -1,4 +1,5 @@
 #region
+using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static Essentials;
@@ -11,14 +12,13 @@ public class Player : MonoBehaviour
 {
     #region Serialized Fields
     [Header("Cached References")]
-    new CapsuleCollider2D collider;
+    CapsuleCollider2D hitbox;
     Camera cam;
     SpriteRenderer sprite;
     Transition transition;
-    SpriteRenderer spriteRenderer;
     PlayerAnimator playerAnimator;
 
-    // Turn moveInput into property eventually.
+    //TODO: Turn moveInput into property eventually.
 
     [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
 
     [Header("Read-only Fields")]
     [ReadOnly] public Vector2 moveInput;
+    [Space(25)]
     [SerializeField, ReadOnly] bool isDead;
 
     #endregion
@@ -49,8 +50,11 @@ public class Player : MonoBehaviour
             IsDead = currentHealth <= 0;
             if (IsDead) HandleDeath();
 
-            if (currentHealth < previousHealth) //TODO: this method runs even if the player is healed.
-                StartCoroutine(playerAnimator.DamageRoutine());
+            if (currentHealth < previousHealth)
+            {
+                CameraShake.Instance.ShakeCamera(1.5f, 0.2f);
+                StartCoroutine(DamageRoutine(5));
+            }
         }
     }
 
@@ -61,7 +65,6 @@ public class Player : MonoBehaviour
     }
     #endregion
 
-    // Start is called before the first frame update
     void Start()
     {
         // Randomize Spawn Position
@@ -69,13 +72,12 @@ public class Player : MonoBehaviour
 
         cam            = Camera.main;
         RB             = GetComponent<Rigidbody2D>();
-        collider       = GetComponent<CapsuleCollider2D>();
+        hitbox       = GetComponent<CapsuleCollider2D>();
         sprite         = GetComponentInChildren<SpriteRenderer>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         transition     = FindObjectOfType<Transition>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!IsDead) PlayerLogic();
@@ -125,6 +127,30 @@ public class Player : MonoBehaviour
                 IsFacingRight = true;
                 Assert(IsFacingRight, "Facing Right!");
             }
+        }
+    }
+
+    IEnumerator DamageRoutine(int blinkCount)
+    {
+        if (CurrentHealth == 0) yield break;
+        // Invincibility frames
+        hitbox.enabled = false;
+        yield return new WaitForSeconds(0.5f);
+        hitbox.enabled = true;
+
+        // Flash the player red.
+        sprite.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        sprite.color = Color.white;
+
+        // Blink the player to indicate invincibility frames.
+        const float blinkTime = 0.1f;
+        for (int i = 0; i < blinkCount; i++)
+        {
+            sprite.enabled = false;
+            yield return new WaitForSeconds(blinkTime);
+            sprite.enabled = true;
+            yield return new WaitForSeconds(blinkTime);
         }
     }
 

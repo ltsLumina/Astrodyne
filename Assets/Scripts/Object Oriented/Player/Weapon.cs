@@ -93,6 +93,8 @@ public class Weapon : MonoBehaviour
             pooledBullet.transform.position = transform.position;
             pooledBullet.transform.rotation = transform.rotation;
 
+            // animator.setBool(incombat = true)
+
             // Add force to the bullet.
             Rigidbody2D bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
             bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
