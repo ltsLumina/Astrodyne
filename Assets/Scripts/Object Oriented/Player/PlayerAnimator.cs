@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -5,22 +6,27 @@ public class PlayerAnimator : MonoBehaviour
 {
     Player player;
     Dash dash;
-    Animator anim;
     SpriteRenderer sprite;
     GameObject afterImage;
     ParticleSystem.MainModule parSys;
+    Weapon weapon;
+
+    public Animator Anim { get; private set; }
+    public EventHandler OnAnimationChange;
 
     [Header("Cached Hashes")]
     readonly static int IsMoving = Animator.StringToHash("isMoving");
+    readonly static int InCombat = Animator.StringToHash("inCombat");
 
     void Awake()
     {
         player     = GetComponentInParent<Player>();
         dash       = GetComponentInParent<Dash>();
-        anim       = GetComponent<Animator>();
+        Anim       = GetComponent<Animator>();
         sprite     = GetComponent<SpriteRenderer>();
         afterImage = transform.GetChild(1).gameObject;
-        parSys     = transform.GetChild(1).GetComponent<ParticleSystem>().main;
+        parSys     = afterImage.GetComponentInChildren<ParticleSystem>().main;
+        weapon     = transform.parent.GetComponentInChildren<Weapon>();
 
     }
 
@@ -31,8 +37,13 @@ public class PlayerAnimator : MonoBehaviour
 
     void HandleAnimationChange()
     {
+        OnAnimationChange?.Invoke(this, EventArgs.Empty); //TODO: this
+
         // If the player is moving, set the isMoving parameter to true.
-        anim.SetBool(IsMoving, player.moveInput != Vector2.zero);
+        Anim.SetBool(IsMoving, player.moveInput != Vector2.zero);
+
+        // In combat
+        Anim.SetBool(InCombat, weapon.IsInCombat());
 
         // Attack animation.
 

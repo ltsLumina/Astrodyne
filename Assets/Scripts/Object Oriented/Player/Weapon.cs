@@ -13,25 +13,35 @@ public class Weapon : MonoBehaviour
     Transform playerPos;
     Player player;
     ObjectPool bulletPool;
-
-    CancellationTokenSource cancellationToken;
+    Animator animator;
 
     [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon."), ReadOnly]
     [SerializeField] float timeSinceLastShot;
+    [SerializeField] float combatTime;
     [SerializeField] float fireRate;
 
     [Header("Bullet Fields")]
     [SerializeField] float bulletLifetime;
     [SerializeField] float bulletForce;
+
+    [Header("Cached Animator References")]
+    readonly static int InCombat = Animator.StringToHash("inCombat");
+
+    public float CombatTime
+    {
+        get => combatTime;
+        set => combatTime = value;
+    }
     #endregion
 
     void Start()
     {
-        cam               = Camera.main;
-        playerPos         = FindObjectOfType<Player>().transform;
-        player            = FindObjectOfType<Player>();
-        bulletPool        = FindObjectOfType<ObjectPool>();
-        cancellationToken = new CancellationTokenSource();
+        cam        = Camera.main;
+        playerPos  = FindObjectOfType<Player>().transform;
+        player     = FindObjectOfType<Player>();
+        bulletPool = FindObjectOfType<ObjectPool>();
+        animator   = player.GetComponentInChildren<PlayerAnimator>().Anim;
+
 
         // Assertions:
         // Return bullet to pool after bulletLifetime seconds. Also asserting that the bulletLifetime is greater than 0.
@@ -42,7 +52,6 @@ public class Weapon : MonoBehaviour
     {
         if (!player.IsDead) WeaponLogic();
     }
-
 
     // ReSharper disable Unity.PerformanceAnalysis
     /// <summary>
@@ -83,6 +92,9 @@ public class Weapon : MonoBehaviour
             if (!Input.GetMouseButton(0) || !(timeSinceLastShot > fireRate)) return;
             if (bulletPool == null) return;
 
+            // Enter combat.
+            CombatTime = 10f;
+
             // Initialize the bullet before method call to to avoid closure allocation.
             GameObject pooledBullet = bulletPool.GetPooledObject();
             if (pooledBullet == null) return;
@@ -93,7 +105,6 @@ public class Weapon : MonoBehaviour
             pooledBullet.transform.position = transform.position;
             pooledBullet.transform.rotation = transform.rotation;
 
-            // animator.setBool(incombat = true)
 
             // Add force to the bullet.
             Rigidbody2D bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
@@ -106,5 +117,15 @@ public class Weapon : MonoBehaviour
             // Reset the time since the last shot.
             timeSinceLastShot = 0;
         }
+    }
+
+    public bool IsInCombat()
+    {
+        if (CombatTime > 0)
+        {
+            CombatTime -= Time.deltaTime;
+        }
+
+        return CombatTime > 0;
     }
 }

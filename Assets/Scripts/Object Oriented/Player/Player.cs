@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
 
         cam            = Camera.main;
         RB             = GetComponent<Rigidbody2D>();
-        hitbox       = GetComponent<CapsuleCollider2D>();
+        hitbox         = GetComponent<CapsuleCollider2D>();
         sprite         = GetComponentInChildren<SpriteRenderer>();
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         transition     = FindObjectOfType<Transition>();
@@ -95,7 +95,7 @@ public class Player : MonoBehaviour
 
         void Boundaries()
         { // Keeps the player within the camera's view.
-            Vector3 viewPos = cam.WorldToViewportPoint(transform.position);
+            Vector3 viewPos    = cam.WorldToViewportPoint(transform.position);
             viewPos.x          = Mathf.Clamp01(viewPos.x);
             viewPos.y          = Mathf.Clamp01(viewPos.y);
             transform.position = cam.ViewportToWorldPoint(viewPos);
@@ -108,6 +108,11 @@ public class Player : MonoBehaviour
             moveInput.x = Input.GetAxis("Horizontal");
             moveInput.y = Input.GetAxis("Vertical");
             RB.velocity = new Vector2(moveInput.x, moveInput.y) * moveSpeed;
+            // Vector2 force = new Vector2(moveInput.x, moveInput.y).normalized * moveSpeed;
+
+            // adjust RB.drag based on moveInput
+
+            // RB.AddForce(force, ForceMode2D.Force);
         }
 
         void FaceMouse()
