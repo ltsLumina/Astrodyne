@@ -1,7 +1,7 @@
 #region
 using System.Collections;
 using UnityEngine;
-using static Essentials;
+using Essentials;
 using static UnityEngine.Debug;
 #endregion
 
@@ -10,6 +10,7 @@ public class Dash : InputManager
     [Header("Cached References")]
     Player player;
     Camera cam;
+    PlayerAnimator playerAnimator;
 
     [Header("Dash"), Space(5), SerializeField]
     int dashCount;
@@ -30,6 +31,10 @@ public class Dash : InputManager
     [SerializeField, ReadOnly] float lastPressedDashTime;
     [SerializeField, ReadOnly] bool isDashing;
 
+    // Delegates
+    public delegate void OnDash();
+    public event OnDash onDash;
+
     public bool IsDashing
     {
         get => isDashing;
@@ -46,6 +51,7 @@ public class Dash : InputManager
     {
         player = GetComponent<Player>();
         cam    = Camera.main;
+        playerAnimator = GetComponentInChildren<PlayerAnimator>();
     }
 
     void Update()
@@ -65,7 +71,7 @@ public class Dash : InputManager
     Vector2 GetDashDirection()
     {
         // If the player is moving, dash in the direction of the input, otherwise, dash in the direction of the mouse.
-        if (player.moveInput != Vector2.zero) return player.moveInput;
+        if (player.MoveInput != Vector2.zero) return player.MoveInput;
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         return mousePos;
     }
@@ -79,6 +85,7 @@ public class Dash : InputManager
             Sleep(dashSleepTime);
 
             // Run the dash coroutine.
+            onDash?.Invoke();
             StartCoroutine(nameof(StartDash), dashDirection);
         }
     }

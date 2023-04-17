@@ -2,24 +2,28 @@
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using static Essentials;
-using static UnityEngine.Debug;
+using Essentials;
+using UnityEngine.Events;
 using static Essentials.UsefulMethods;
+using static UnityEngine.Debug;
 #endregion
 
 [RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
 public class Player : MonoBehaviour
 {
-    #region Serialized Fields
+
+    #region Cached References
     [Header("Cached References")]
     CapsuleCollider2D hitbox;
     Camera cam;
     SpriteRenderer sprite;
     Transition transition;
     PlayerAnimator playerAnimator;
+    #endregion
 
     //TODO: Turn moveInput into property eventually.
 
+    #region Configurable Parameters
     [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
 
@@ -29,11 +33,16 @@ public class Player : MonoBehaviour
     int previousHealth;
 
     [Header("Read-only Fields")]
-    [ReadOnly] public Vector2 moveInput;
-    [Space(25)]
+    [SerializeField, ReadOnly] Vector2 moveInput;
+    [SerializeField, ReadOnly] Vector2 lastMoveInput;
     [SerializeField, ReadOnly] bool isDead;
-
     #endregion
+
+    public delegate void OnMoveInputChanged(Vector2 moveInput);
+    public event OnMoveInputChanged onMoveInputChanged;
+
+    public delegate void OnPlayerTakeDamage();
+    public event OnPlayerTakeDamage onPlayerTakeDamage;
 
     #region Properties
     public Rigidbody2D RB { get; private set; }
@@ -47,21 +56,39 @@ public class Player : MonoBehaviour
             currentHealth  = value;
             currentHealth  = Mathf.Clamp(currentHealth, 0, maxHealth);
 
+            if (!IsDead) // Delegate for when the player takes damage.
+                onPlayerTakeDamage  += PerformOnTakeDamage;
+            else // Unsubscribe from the delegate when the player is dead.
+                onPlayerTakeDamage -= PerformOnTakeDamage;
+
+            if (currentHealth < previousHealth)
+                onPlayerTakeDamage?.Invoke();
+
             IsDead = currentHealth <= 0;
             if (IsDead) HandleDeath();
 
-            if (currentHealth < previousHealth)
-            {
-                CameraShake.Instance.ShakeCamera(1.5f, 0.2f);
-                StartCoroutine(DamageRoutine(5));
-            }
         }
     }
-
     public bool IsDead
     {
         get => isDead;
         private set => isDead = value;
+    }
+    public Vector2 MoveInput
+    {
+        get => moveInput;
+        set
+        {
+            lastMoveInput = moveInput;
+            moveInput     = value;
+
+            // Notify the player animator of the change in move input.
+            if (moveInput != lastMoveInput)
+            {
+                lastMoveInput = moveInput;
+                onMoveInputChanged?.Invoke(moveInput);
+            }
+        }
     }
     #endregion
 
@@ -80,7 +107,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (!IsDead) PlayerLogic();
+        if (IsDead) return; PlayerLogic();
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
@@ -105,14 +132,21 @@ public class Player : MonoBehaviour
         { // Movement: WASD or Arrow Keys
             // Moves the player by getting their input and multiplying it by the move speed.
             // Gives the movement an acceleration/deceleration feel.
-            moveInput.x = Input.GetAxis("Horizontal");
-            moveInput.y = Input.GetAxis("Vertical");
-            RB.velocity = new Vector2(moveInput.x, moveInput.y) * moveSpeed;
-            // Vector2 force = new Vector2(moveInput.x, moveInput.y).normalized * moveSpeed;
+            MoveInput = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+            // Delegate to PlayerAnimator
+            if (MoveInput != lastMoveInput)
+            {
+                lastMoveInput = MoveInput;
+                onMoveInputChanged?.Invoke(MoveInput);
+            }
+
+            //RB.velocity = new Vector2(moveInput.x, moveInput.y) * moveSpeed;
+            Vector2 force = new Vector2(MoveInput.x, MoveInput.y).normalized * moveSpeed;
 
             // adjust RB.drag based on moveInput
 
-            // RB.AddForce(force, ForceMode2D.Force);
+            RB.AddForce(force, ForceMode2D.Force);
         }
 
         void FaceMouse()
@@ -120,7 +154,7 @@ public class Player : MonoBehaviour
             Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
 
             // Flip the sprite if the mouse is on the left side of the player
-            if (mousePos.x > transform.position.x)
+            if (mousePos.x < transform.position.x)
             {
                 sprite.flipX  = true;
                 IsFacingRight = false;
@@ -135,28 +169,24 @@ public class Player : MonoBehaviour
         }
     }
 
-    IEnumerator DamageRoutine(int blinkCount)
+    // Void method necessary to subscribe to the delegate in the CurrentHealth property.
+    public void PerformOnTakeDamage() => StartCoroutine(OnTakeDamage());
+
+    IEnumerator OnTakeDamage()
     {
+        // If the player is dead, stop the coroutine.
         if (CurrentHealth == 0) yield break;
-        // Invincibility frames
+
+        // Camera shake to indicate damage has been taken.
+        CameraShake.Instance.ShakeCamera(1.5f, 0.2f);
+
+        // Invincibility frames.
         hitbox.enabled = false;
         yield return new WaitForSeconds(0.5f);
         hitbox.enabled = true;
 
-        // Flash the player red.
-        sprite.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        sprite.color = Color.white;
-
-        // Blink the player to indicate invincibility frames.
-        const float blinkTime = 0.1f;
-        for (int i = 0; i < blinkCount; i++)
-        {
-            sprite.enabled = false;
-            yield return new WaitForSeconds(blinkTime);
-            sprite.enabled = true;
-            yield return new WaitForSeconds(blinkTime);
-        }
+        // Blink the sprite to indicate damage has been taken and invincibility frames.
+        StartCoroutine(playerAnimator.SpriteRoutine(0.5f));
     }
 
     void HandleDeath()

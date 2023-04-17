@@ -1,4 +1,3 @@
-﻿#region
 #region
 using System;
 using System.Reflection;
@@ -10,9 +9,9 @@ using UnityEditor.ShortcutManagement;
 using UnityEngine;
 #endregion
 
-internal static partial class Essentials
+namespace Essentials
 {
-    internal static class UsefulShortcuts
+    public static class UsefulShortcuts
     {
         /// <summary>
         ///     A collection of debugging shortcuts.
@@ -55,7 +54,7 @@ internal static partial class Essentials
 #endif
     }
 
-    internal static class UsefulMethods
+    public static class UsefulMethods
     {
         /// <summary>
         ///     Alt+ C to clear the console.
@@ -78,7 +77,7 @@ internal static partial class Essentials
         /// <param name="delayInSeconds">The delay before running the method.</param>
         /// <param name="debugLog">Whether or not to debug the waiting message.</param>
         /// <param name="cancellationToken"> Token for cancelling the currently running task. Not required. </param>
-        internal static async UniTask DelayedTaskAsync(
+        public static async UniTask DelayedTaskAsync(
             Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
         {
             if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
@@ -114,14 +113,9 @@ internal static partial class Essentials
             });
         }
     }
-}
-#endregion
 
-internal static partial class Essentials
-{
     public class ReadOnlyAttribute : PropertyAttribute
-    {
-    }
+    { }
 
     /// <summary>
     ///     Allows you to add '[ReadOnly]' before a variable so that it is shown but not editable in the inspector.

@@ -42,11 +42,10 @@ public abstract class InputManager : MonoBehaviour
         new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
     #region SLEEP METHOD
-    protected void Sleep(float duration)
-    {
+    protected void Sleep(float duration) =>
+
         //Method used so we don't need to call StartCoroutine everywhere
         StartCoroutine(nameof(PerformSleep), duration);
-    }
 
     IEnumerator PerformSleep(float duration)
     {
