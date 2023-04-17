@@ -7,7 +7,10 @@
 ## Game Design
  
 #### Character:
-The player will be an [undecided] character who has the ability to draw magical cards that they can recieve buffs from, or alternatively use as a weapon to attack randomly spawning enemies.
+The player will be a desciple of the grim reaper who has the ability to draw the souls of his enemies, and then use them to recieve buffs, or alternatively use as a weapon to attack waves of randomly spawning enemies.
+
+#### Mechanic
+To be able to harvest upgrades, AKA "Souls", the player must use their scythe as a melee weapon. This adds a hint of risk to getting stronger, rather than relying on your ranged weapons or abilities.
 
 #### World: 
 The world will be comprised of smaller, individual rooms that lock behind when you enter, similar to Binding of Isaac. Once you enter you must kill the enemies that are inside, of which some rooms will spawn in enemies in waves. Once a room is cleared the player has a chance to be rewarded a upgrade card.
