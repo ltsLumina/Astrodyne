@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using static UnityEngine.Debug;
 using static Essentials.UsefulMethods;
 using ReadOnly = Essentials.ReadOnlyAttribute;
@@ -22,7 +21,6 @@ public class Weapon : MonoBehaviour
     [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon.")]
     [SerializeField] float fireRate;
     [SerializeField] float combatDuration = 10f;
-
 
     [Header("Bullet Fields")]
     [SerializeField] float bulletLifetime;
@@ -111,8 +109,8 @@ public class Weapon : MonoBehaviour
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
 
         // Rotates the object in relation to the mouse position.
-        Vector2 direction = mousePos - (Vector2) playerPos.position;
-        float   angle     = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Vector2 direction  = mousePos - (Vector2)playerPos.position;
+        float   angle      = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle + 270, Vector3.forward);
     }
 
@@ -158,12 +156,16 @@ public class Weapon : MonoBehaviour
         var bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
         bulletRB.AddForce(transform.up * bulletForce, ForceMode2D.Impulse);
 
-        // Return the bullet to the pool after bulletLifetime seconds.
-        Task delayTask = DelayedTaskAsync(() => pooledBullet.SetActive(false), bulletLifetime).AsTask();
-        delayTask.ContinueWith(_ => Log("Bullet returned to pool!"));
+        PostShooting();
 
-        // Reset the time since the last shot.
-        timeSinceLastShot = 0;
+        void PostShooting()
+        { // Return the bullet to the pool after bulletLifetime seconds.
+            Task delayTask = DelayedTaskAsync(() => pooledBullet.SetActive(false), bulletLifetime).AsTask();
+            delayTask.ContinueWith(_ => Log("Bullet returned to pool!"));
+
+            // Reset the time since the last shot.
+            timeSinceLastShot = 0;
+        }
     }
 
     public bool IsInCombat()
