@@ -1,4 +1,4 @@
-using System.Threading;
+using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -15,6 +15,7 @@ public class Weapon : MonoBehaviour
     Player player;
     SpriteRenderer sprite;
     ObjectPool bulletPool;
+    MeleeComboSystem meleeSys;
     #endregion
 
     #region Configurable Parameters
@@ -48,10 +49,12 @@ public class Weapon : MonoBehaviour
         player         = FindObjectOfType<Player>();
         sprite         = GetComponent<SpriteRenderer>();
         bulletPool     = FindObjectOfType<ObjectPool>();
+        meleeSys       = GetComponent<MeleeComboSystem>();
 
         // Assertions:
         // Return bullet to pool after bulletLifetime seconds. Also asserting that the bulletLifetime is greater than 0.
-        Assert(bulletLifetime > 0, "Bullet lifetime is less than or equal to 0. This will cause the bullet to never be returned to the pool.");
+        Assert(bulletLifetime > 0, "Bullet lifetime is less than or equal to 0. " +
+                                   "This will cause the bullet to never be returned to the pool.");
     }
 
     void Update()
@@ -65,42 +68,13 @@ public class Weapon : MonoBehaviour
     /// </summary>
     void WeaponLogic()
     {
-        //HandleRotation();
-        FaceMouse();
+        HandleRotation();
+        //FaceMouse();
         //HandleWeaponPosition();
-        HandleShooting();
+        Shooting();
 
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            // disable all the trail renderers
-            foreach (TrailRenderer trail in GetComponentsInChildren<TrailRenderer>())
-            {
-                trail.enabled = false;
-            }
-        }
-
-        //TODO: MAKE COMBO SCRIPT
-        //USE THIS: https://www.youtube.com/watch?v=Jm0mbHEFPfE
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            GetComponentInChildren<TrailRenderer>().Clear();
-            GetComponentInChildren<TrailRenderer>().enabled = true;
-            GetComponent<Animator>().SetTrigger("doAttack1");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            GetComponentInChildren<TrailRenderer>().Clear();
-            GetComponentInChildren<TrailRenderer>().enabled = true;
-            GetComponent<Animator>().SetTrigger("doAttack2");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            GetComponentInChildren<TrailRenderer>().Clear();
-            GetComponentInChildren<TrailRenderer>().enabled = true;
-            GetComponent<Animator>().SetTrigger("doAttack3");
-        }
+        //StartCoroutine(GetComponent<MeleeComboSystem>().MeleeCombat());
+        meleeSys.MeleeCombat();
     }
 
     void HandleRotation()
@@ -111,15 +85,16 @@ public class Weapon : MonoBehaviour
         // Rotates the object in relation to the mouse position.
         Vector2 direction  = mousePos - (Vector2)playerPos.position;
         float   angle      = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.AngleAxis(angle + 270, Vector3.forward);
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     void FaceMouse()
-    { // Smoothly rotates player to face mouse.
+    { // Smoothly rotates the weapon to face the mouse.
         Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        var position = transform.position;
 
-        // Flip the sprite if the mouse is on the left side of the player
-        sprite.flipX = mousePos.x < transform.position.x;
+        // Flip the sprite if the mouse is on the right side of the player
+        sprite.flipX = mousePos.x > position.x;
     }
 
     void HandleWeaponPosition()
@@ -130,7 +105,7 @@ public class Weapon : MonoBehaviour
             : (Vector2) playerPos.position + new Vector2(0.3f, 0.5f);
     }
 
-    void HandleShooting() //TODO: THERE IS KNOCKBACK? // figured it out, the bullet is hitting the player and pushing them back.
+    void Shooting() //TODO: THERE IS KNOCKBACK? // figured it out, the bullet is hitting the player and pushing them back.
     {
         // Increments the time since the last shot, and while it is larger than the fireRate, the player can shoot.
         timeSinceLastShot += Time.deltaTime;
@@ -144,12 +119,22 @@ public class Weapon : MonoBehaviour
 
         // Initialize the bullet before method call to to avoid closure allocation.
         GameObject pooledBullet = bulletPool.GetPooledObject();
-        if (pooledBullet == null) return;
+        try {
+            if (pooledBullet == null) return;
+        } catch (Exception e) {
+            Log("Pooled bullet is null! \n" + e);
+            throw;
+        }
 
         // Activate the bullet, and set its position and rotation.
         pooledBullet.GetComponent<TrailRenderer>().Clear(); //TODO: Probably a bad idea calling GetComponent every time, but it works for now.
         pooledBullet = bulletPool.GetPooledObject(true);
-        pooledBullet.transform.position = transform.position;
+
+        //pooledBullet.transform.position = transform.position;
+        // Set the position to the weapons position plus an offset relative to the mouse position.
+            Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            pooledBullet.transform.position = transform.position + (mousePos - transform.position).normalized * 0.5f;
+
         pooledBullet.transform.rotation = transform.rotation;
 
         // Add force to the bullet.

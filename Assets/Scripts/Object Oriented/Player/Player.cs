@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
     Camera cam;
     SpriteRenderer sprite;
     Transition transition;
-    PlayerAnimator playerAnimator;
+    PlayerAnimationManager playerAnimationManager;
     #endregion
 
     //TODO: Turn moveInput into property eventually.
@@ -56,11 +56,6 @@ public class Player : MonoBehaviour
             currentHealth  = value;
             currentHealth  = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-            if (!IsDead) // Delegate for when the player takes damage.
-                onPlayerTakeDamage  += PerformOnTakeDamage;
-            else // Unsubscribe from the delegate when the player is dead.
-                onPlayerTakeDamage -= PerformOnTakeDamage;
-
             if (currentHealth < previousHealth)
                 onPlayerTakeDamage?.Invoke();
 
@@ -77,7 +72,7 @@ public class Player : MonoBehaviour
     public Vector2 MoveInput
     {
         get => moveInput;
-        set
+        private set
         {
             lastMoveInput = moveInput;
             moveInput     = value;
@@ -101,8 +96,11 @@ public class Player : MonoBehaviour
         RB             = GetComponent<Rigidbody2D>();
         hitbox         = GetComponent<CapsuleCollider2D>();
         sprite         = GetComponentInChildren<SpriteRenderer>();
-        playerAnimator = GetComponentInChildren<PlayerAnimator>();
+        playerAnimationManager = GetComponentInChildren<PlayerAnimationManager>();
         transition     = FindObjectOfType<Transition>();
+
+        // Delegate for when the player takes damage.
+        onPlayerTakeDamage += PerformOnTakeDamage;
     }
 
     void Update()
@@ -186,7 +184,7 @@ public class Player : MonoBehaviour
         hitbox.enabled = true;
 
         // Blink the sprite to indicate damage has been taken and invincibility frames.
-        StartCoroutine(playerAnimator.SpriteRoutine(0.5f));
+        StartCoroutine(PlayerAnimationManager.SpriteRoutine(0.5f, sprite));
     }
 
     void HandleDeath()
@@ -194,6 +192,9 @@ public class Player : MonoBehaviour
         // Debug that the player is dead and freeze their movement.
         Log("Player is dead.");
         RB.FreezeAllConstraints();
+
+        // Unsubscribe from the delegate when the player is dead.
+        onPlayerTakeDamage -= PerformOnTakeDamage;
 
         // Close the curtains and wait 2 seconds before loading the game over scene.
         var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2).AsTask();

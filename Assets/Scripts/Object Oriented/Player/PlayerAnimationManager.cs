@@ -3,17 +3,18 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlayerAnimator : MonoBehaviour
+public class PlayerAnimationManager : MonoBehaviour
 {
     Player player;
     SpriteRenderer playerSprite;
     Dash dash;
-    SpriteRenderer sprite;
     GameObject afterImage;
     ParticleSystem.MainModule parSys;
     Weapon weapon;
+    SpriteRenderer weaponSprite;
+    MeleeComboSystem meleeSys;
 
-    public Animator Anim { get; private set; }
+    public Animator PlayerAnim { get; private set; }
 
     [Header("Cached Hashes")]
     readonly static int IsMoving = Animator.StringToHash("isMoving");
@@ -21,22 +22,27 @@ public class PlayerAnimator : MonoBehaviour
 
     void Start()
     {
-        player     = GetComponentInParent<Player>();
-        dash       = GetComponentInParent<Dash>();
-        Anim       = GetComponent<Animator>();
-        sprite     = GetComponent<SpriteRenderer>();
-        afterImage = transform.GetChild(1).gameObject;
-        parSys     = afterImage.GetComponentInChildren<ParticleSystem>().main;
-        weapon     = transform.parent.GetComponentInChildren<Weapon>();
+        player       = GetComponentInParent<Player>();
+        playerSprite = GetComponent<SpriteRenderer>();
+        dash         = GetComponentInParent<Dash>();
+        afterImage   = transform.GetChild(1).gameObject; // TODO: Make this more robust, rather than accessing by index.
+        parSys       = afterImage.GetComponentInChildren<ParticleSystem>().main;
+        PlayerAnim   = GetComponent<Animator>();
 
-        // Alternatively:
-        // player.onMoveInputChanged += OnMoveInputChanged;
-        // weapon.onShoot            += OnShoot;
-        // dash.onDash               += OnDash;
+        // All weapon related components are children of the player.
+        var parent = transform.parent;
+        weapon       = parent.GetComponentInChildren<Weapon>();
+        meleeSys     = parent.GetComponentInChildren<MeleeComboSystem>();
+        weaponSprite = weapon.GetComponent<SpriteRenderer>();
 
-        player.onMoveInputChanged += _ => Anim.SetBool(IsMoving, player.MoveInput != Vector2.zero);
-        weapon.onShoot            += () => Anim.SetBool(InCombat, weapon.IsInCombat());
-        dash.onDash               += () =>
+        player.onMoveInputChanged += _ => PlayerAnim.SetBool(IsMoving, player.MoveInput != Vector2.zero);
+        weapon.onShoot            += EnterCombat;
+        meleeSys.onMeleeAttack += () =>
+        {
+            RandomizeSlashDirection();
+            EnterCombat();
+        };
+        dash.onDash += () =>
         {
             if (!dash.IsDashing) return;
             CameraShake.Instance.ShakeCamera(3f, 0.2f);
@@ -45,19 +51,9 @@ public class PlayerAnimator : MonoBehaviour
     }
 
     #region Event Handlers
-    void OnMoveInputChanged(Vector2 moveInput) =>
-        Anim.SetBool(IsMoving, moveInput != Vector2.zero);
-
-    void OnShoot() =>
-        Anim.SetBool(InCombat, weapon.IsInCombat());
-
-    void OnDash()
-    {
-        if (!dash.IsDashing) return;
-        CameraShake.Instance.ShakeCamera(3f, 0.2f);
-        StartCoroutine(AfterImageRoutine());
-    }
-    #endregion
+    void EnterCombat() =>
+        PlayerAnim.SetBool(InCombat, weapon.IsInCombat());
+        #endregion
 
     #region Coroutines
     IEnumerator AfterImageRoutine()
@@ -71,7 +67,7 @@ public class PlayerAnimator : MonoBehaviour
         afterImage.SetActive(false);
     }
 
-    public IEnumerator SpriteRoutine(float duration)
+    public static IEnumerator SpriteRoutine(float duration, SpriteRenderer sprite)
     {
         float timeElapsed = 0f;
 
@@ -97,4 +93,11 @@ public class PlayerAnimator : MonoBehaviour
         }
     }
     #endregion
+
+    //TODO: Move this to a more appropriate class, e.g WeaponAnimationManager.
+    void RandomizeSlashDirection()
+    {
+        int rand = UnityEngine.Random.Range(0, 2);
+        weaponSprite.flipY = rand == 1;
+    }
 }

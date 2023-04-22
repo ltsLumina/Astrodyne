@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    int health = 10;
+
     void Update()
     {
         // move towards player
@@ -12,6 +14,22 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("HIT PLAYER");
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("HIT PLAYER");
+        }
+
+        if (other.gameObject.CompareTag("Weapon"))
+        {
+            Debug.Log("HIT WEAPON, BOUNCING OFF");
+            Vector2 direction = (other.transform.position - transform.position).normalized;
+            transform.Translate(-direction * 25 * Time.deltaTime);
+
+            // take damage
+            health--;
+            StartCoroutine(PlayerAnimationManager.SpriteRoutine(0.5f, GetComponent<SpriteRenderer>()));
+
+            if (health <= 0) Destroy(gameObject);
+        }
     }
 }

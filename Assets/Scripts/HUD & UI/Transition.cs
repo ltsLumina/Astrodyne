@@ -1,10 +1,5 @@
-using System;
-using UnityEditor.Animations;
 using UnityEngine;
 
-/// <summary>
-/// //TODO: Write a summary.
-/// </summary>
 public class Transition : SingletonPersistent<Transition>
 {
     [SerializeField] Animator animLeft;

@@ -10,7 +10,7 @@ public class Dash : InputManager
     [Header("Cached References")]
     Player player;
     Camera cam;
-    PlayerAnimator playerAnimator;
+    PlayerAnimationManager playerAnimationManager;
 
     [Header("Dash"), Space(5), SerializeField]
     int dashCount;
@@ -51,7 +51,7 @@ public class Dash : InputManager
     {
         player = GetComponent<Player>();
         cam    = Camera.main;
-        playerAnimator = GetComponentInChildren<PlayerAnimator>();
+        playerAnimationManager = GetComponentInChildren<PlayerAnimationManager>();
     }
 
     void Update()

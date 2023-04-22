@@ -56,7 +56,7 @@ public class SingletonPersistent<T> : MonoBehaviour where T : Component
         if (instance == null)
         {
             instance = this as T;
-            DontDestroyOnLoad(gameObject); //TODO: Returns a warning??
+            DontDestroyOnLoad(gameObject.transform.parent);
         }
         else { Destroy(gameObject); }
     }
