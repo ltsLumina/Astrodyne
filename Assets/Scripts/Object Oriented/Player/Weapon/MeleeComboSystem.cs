@@ -1,14 +1,16 @@
+using System;
 using Essentials;
 using UnityEngine;
 
 public class MeleeComboSystem : MonoBehaviour
 {
     #region Configurable Parameters
+    [Header("Melee Parameters"), Tooltip("Parameters that govern the melee attack of the weapon.")]
     [SerializeField] int attackDamage = 10;
-    [SerializeField] float attackTime = 0.45f;
     [SerializeField] float attackForce;
+    [Space(5)]
     [SerializeField, Tooltip("Adjust attack time and attack speed together for the smoothest animation.")]
-    float attackSpeed;
+    float attackDelay, attackSpeed;
 
     [Header("Read-only Fields"), SerializeField, ReadOnly]
     float timeSinceLastMelee;
@@ -54,7 +56,7 @@ public class MeleeComboSystem : MonoBehaviour
 
         //TODO: MAKE COMBO SCRIPT
         //USE THIS: https://www.youtube.com/watch?v=Jm0mbHEFPfE
-        if (Input.GetMouseButton(1) && timeSinceLastMelee > attackTime)
+        if (Input.GetMouseButton(1) && timeSinceLastMelee > attackDelay)
         {
             onMeleeAttack?.Invoke();
 

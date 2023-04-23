@@ -16,6 +16,7 @@ public class Weapon : MonoBehaviour
     SpriteRenderer sprite;
     ObjectPool bulletPool;
     MeleeComboSystem meleeSys;
+    SlashEffect slashEffect;
     #endregion
 
     #region Configurable Parameters
@@ -54,6 +55,7 @@ public class Weapon : MonoBehaviour
         sprite         = transform.GetChild(0).GetComponent<SpriteRenderer>(); // TODO: Make this more robust, rather than accessing by index.
         bulletPool     = FindObjectOfType<ObjectPool>();
         meleeSys       = GetComponent<MeleeComboSystem>();
+        slashEffect    = GetComponentInChildren<SlashEffect>();
 
         onShoot += EnterCombat;
 
@@ -74,9 +76,8 @@ public class Weapon : MonoBehaviour
     /// </summary>
     void WeaponLogic()
     {
-        HandleRotation();
-        //FaceMouse();
-        //HandleWeaponPosition();
+        //HandleRotation();
+        HandleWeaponPosition();
         Shooting();
 
         meleeSys.MeleeCombat();
@@ -90,23 +91,23 @@ public class Weapon : MonoBehaviour
         // Rotates the object in relation to the mouse position.
         Vector2 direction  = mousePos - (Vector2)playerPos.position;
         float   angle      = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        //transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        slashEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
-    void FaceMouse()
-    { // Smoothly rotates the weapon to face the mouse.
-        Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        var position = transform.position;
+    void HandleWeaponPosition()
+    {
+        Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
 
-        // Flip the sprite if the mouse is on the right side of the player
-        sprite.flipX = mousePos.x > position.x;
+        // Rotates the object in relation to the mouse position.
+        Vector2 direction  = mousePos - (Vector2)playerPos.position;
+
+        transform.up = direction;
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.GetChild(0).rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        slashEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
-
-    void HandleWeaponPosition() =>
-        // Moves the weapon slightly to the left or right, depending on if the player isFacingRight.
-        transform.position = player.IsFacingRight
-            ? (Vector2) playerPos.position + new Vector2(-0.3f, 0.5f)
-            : (Vector2) playerPos.position + new Vector2(0.3f, 0.5f);
 
     void Shooting() //TODO: THERE IS KNOCKBACK? // figured it out, the bullet is hitting the player and pushing them back.
     {

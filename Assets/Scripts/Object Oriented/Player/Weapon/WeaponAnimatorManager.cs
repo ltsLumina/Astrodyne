@@ -7,14 +7,15 @@ public class WeaponAnimatorManager : MonoBehaviour
     [Header("Cached References")]
     Weapon weapon;
     MeleeComboSystem meleeSys;
-    Animator weaponAnimator;
     SpriteRenderer slashSprite;
     #endregion
+
+    bool slashUp;
 
     [Header("Cached Hashes")]
     static readonly int InCombat = Animator.StringToHash("inCombat");
 
-    public static Animator WeaponAnim { get; private set; }
+    public static Animator WeaponAnim { get; private set;}
 
     void Start()
     {
@@ -22,14 +23,13 @@ public class WeaponAnimatorManager : MonoBehaviour
 
         // Cached References to other components.
         Transform scytheGameObject = transform.parent;
-        weapon         = scytheGameObject.GetComponent<Weapon>();
-        meleeSys       = scytheGameObject.GetComponent<MeleeComboSystem>();
-        weaponAnimator = scytheGameObject.GetComponentInChildren<Animator>();
+        weapon     = scytheGameObject.GetComponent<Weapon>();
+        meleeSys   = scytheGameObject.GetComponent<MeleeComboSystem>();
         var slashEffect = scytheGameObject.GetComponentInChildren<SlashEffect>();
         slashSprite = slashEffect.GetComponent<SpriteRenderer>();
 
         // Subscribe to events.
-        meleeSys.onMeleeAttack += RandomizeSlashDirection;
+        meleeSys.onMeleeAttack += SlashDirection;
     }
 
     void Update()
@@ -43,11 +43,12 @@ public class WeaponAnimatorManager : MonoBehaviour
         PlayerAnimationManager.PlayerAnim.SetBool(InCombat, weapon.IsInCombat());
     }
 
-    void RandomizeSlashDirection()
+    void SlashDirection()
     {
-        int rand = UnityEngine.Random.Range(0, 2);
-        slashSprite.flipY = rand == 1;
+        slashUp = !slashUp;
 
-        weaponAnimator.SetTrigger(rand == 1 ? "SlashUp" : "SlashDown");
+        slashSprite.flipY = slashUp;
+
+        WeaponAnim.SetTrigger(slashUp ? "slashUp" : "slashDown");
     }
 }
