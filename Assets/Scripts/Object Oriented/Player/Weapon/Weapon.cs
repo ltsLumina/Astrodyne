@@ -21,7 +21,7 @@ public class Weapon : MonoBehaviour
     #region Configurable Parameters
     [Header("Shooting Parameters"), Tooltip("Parameters that govern the shooting of the weapon.")]
     [SerializeField] float fireRate;
-    [SerializeField] float combatDuration = 10f;
+    [SerializeField] float defaultCombatTime = 10f;
 
     [Header("Bullet Fields")]
     [SerializeField] float bulletLifetime;
@@ -39,7 +39,11 @@ public class Weapon : MonoBehaviour
     public float CombatTime
     {
         get => combatTime;
-        set => combatTime = value;
+        set
+        {
+            combatTime = value;
+            combatTime = Mathf.Clamp(combatTime, 0, defaultCombatTime);
+        }
     }
 
     void Start()
@@ -47,9 +51,11 @@ public class Weapon : MonoBehaviour
         cam            = Camera.main;
         playerPos      = FindObjectOfType<Player>().transform;
         player         = FindObjectOfType<Player>();
-        sprite         = GetComponent<SpriteRenderer>();
+        sprite         = transform.GetChild(0).GetComponent<SpriteRenderer>(); // TODO: Make this more robust, rather than accessing by index.
         bulletPool     = FindObjectOfType<ObjectPool>();
         meleeSys       = GetComponent<MeleeComboSystem>();
+
+        onShoot += EnterCombat;
 
         // Assertions:
         // Return bullet to pool after bulletLifetime seconds. Also asserting that the bulletLifetime is greater than 0.
@@ -73,7 +79,6 @@ public class Weapon : MonoBehaviour
         //HandleWeaponPosition();
         Shooting();
 
-        //StartCoroutine(GetComponent<MeleeComboSystem>().MeleeCombat());
         meleeSys.MeleeCombat();
     }
 
@@ -97,25 +102,21 @@ public class Weapon : MonoBehaviour
         sprite.flipX = mousePos.x > position.x;
     }
 
-    void HandleWeaponPosition()
-    {
+    void HandleWeaponPosition() =>
         // Moves the weapon slightly to the left or right, depending on if the player isFacingRight.
         transform.position = player.IsFacingRight
             ? (Vector2) playerPos.position + new Vector2(-0.3f, 0.5f)
             : (Vector2) playerPos.position + new Vector2(0.3f, 0.5f);
-    }
 
     void Shooting() //TODO: THERE IS KNOCKBACK? // figured it out, the bullet is hitting the player and pushing them back.
     {
         // Increments the time since the last shot, and while it is larger than the fireRate, the player can shoot.
         timeSinceLastShot += Time.deltaTime;
+
+        if (!Input.GetMouseButton(0) || !(timeSinceLastShot > fireRate) || bulletPool == null) return;
+
+        // Raise the onShoot event.
         onShoot?.Invoke();
-
-        if (!Input.GetMouseButton(0) || !(timeSinceLastShot > fireRate)) return;
-        if (bulletPool == null) return;
-
-        // Enter combat and begin to countdown the combat timer.
-        CombatTime = combatDuration; // TODO: Make this a configurable parameter.
 
         // Initialize the bullet before method call to to avoid closure allocation.
         GameObject pooledBullet = bulletPool.GetPooledObject();
@@ -132,8 +133,8 @@ public class Weapon : MonoBehaviour
 
         //pooledBullet.transform.position = transform.position;
         // Set the position to the weapons position plus an offset relative to the mouse position.
-            Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-            pooledBullet.transform.position = transform.position + (mousePos - transform.position).normalized * 0.5f;
+        Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        pooledBullet.transform.position = transform.position + (mousePos - transform.position).normalized * 0.5f;
 
         pooledBullet.transform.rotation = transform.rotation;
 
@@ -153,12 +154,12 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    public void EnterCombat() => CombatTime = defaultCombatTime;
+
     public bool IsInCombat()
     {
         if (CombatTime > 0)
-        {
             CombatTime -= Time.deltaTime;
-        }
 
         return CombatTime > 0;
     }

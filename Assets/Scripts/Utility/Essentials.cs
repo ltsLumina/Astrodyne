@@ -32,6 +32,7 @@ namespace Essentials
         static void HealPlayer()
         {
             // Heal the player by 10.
+            if (GameManager.Instance.Player.IsDead) return;
             GameManager.Instance.Player.CurrentHealth += 10;
             Debug.Log("Player healed.");
         }
@@ -78,7 +79,7 @@ namespace Essentials
         /// <param name="debugLog">Whether or not to debug the waiting message.</param>
         /// <param name="cancellationToken"> Token for cancelling the currently running task. Not required. </param>
         public static async UniTask DelayedTaskAsync(
-            Action action, float delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
+            Action action, double delayInSeconds, bool debugLog = false, CancellationToken cancellationToken = default)
         {
             if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
             TimeSpan timeSpan = TimeSpan.FromSeconds(delayInSeconds);

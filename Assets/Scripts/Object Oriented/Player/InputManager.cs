@@ -17,8 +17,8 @@ public abstract class InputManager : MonoBehaviour
     };
     readonly Dictionary<KeyCode, float> doubleTapTimers = new ();
 
-    //TODO: put this at the bottom of the serializedfields.
-    const float DOUBLE_TAP_TIME_THRESHOLD = 0.4f;
+    //TODO: put this at the bottom of the serializedfields. // nevermind, need to make custom editor script and that's not worth it.
+    const float DOUBLE_TAP_TIME_THRESHOLD = 0.25f;
 
     protected bool CheckDoubleTap()
     {

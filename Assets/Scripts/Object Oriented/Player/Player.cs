@@ -11,17 +11,14 @@ using static UnityEngine.Debug;
 [RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
 public class Player : MonoBehaviour
 {
-
     #region Cached References
     [Header("Cached References")]
     CapsuleCollider2D hitbox;
     Camera cam;
     SpriteRenderer sprite;
     Transition transition;
-    PlayerAnimationManager playerAnimationManager;
+    Weapon weapon;
     #endregion
-
-    //TODO: Turn moveInput into property eventually.
 
     #region Configurable Parameters
     [Header("Movement"), Space(5)]
@@ -92,15 +89,19 @@ public class Player : MonoBehaviour
         // Randomize Spawn Position
         transform.position = new (Random.Range(-30f, 7f), Random.Range(-3f, 15f), 0);
 
-        cam            = Camera.main;
-        RB             = GetComponent<Rigidbody2D>();
-        hitbox         = GetComponent<CapsuleCollider2D>();
-        sprite         = GetComponentInChildren<SpriteRenderer>();
-        playerAnimationManager = GetComponentInChildren<PlayerAnimationManager>();
-        transition     = FindObjectOfType<Transition>();
+        cam        = Camera.main;
+        RB         = GetComponent<Rigidbody2D>();
+        hitbox     = GetComponent<CapsuleCollider2D>();
+        sprite     = GetComponentInChildren<SpriteRenderer>();
+        transition = FindObjectOfType<Transition>();
+        weapon     = GetComponentInChildren<Weapon>();
 
         // Delegate for when the player takes damage.
-        onPlayerTakeDamage += PerformOnTakeDamage;
+        onPlayerTakeDamage += () =>
+        {
+            PerformOnTakeDamage();
+            weapon.EnterCombat();
+        };
     }
 
     void Update()
@@ -178,13 +179,15 @@ public class Player : MonoBehaviour
         // Camera shake to indicate damage has been taken.
         CameraShake.Instance.ShakeCamera(1.5f, 0.2f);
 
-        // Invincibility frames.
+        // Disable the hitbox for 1 second to prevent the player from taking damage multiple times.
         hitbox.enabled = false;
-        yield return new WaitForSeconds(0.5f);
-        hitbox.enabled = true;
+        DelayedTaskAsync(() => hitbox.enabled = true, 0.5f).AsTask();
 
         // Blink the sprite to indicate damage has been taken and invincibility frames.
         StartCoroutine(PlayerAnimationManager.SpriteRoutine(0.5f, sprite));
+        //TODO: Keep in mind that we are disabling the collider for a time here. I.e, the player becomes "ghosted", meaning they can pass through walls and enemies.
+
+
     }
 
     void HandleDeath()
@@ -195,6 +198,10 @@ public class Player : MonoBehaviour
 
         // Unsubscribe from the delegate when the player is dead.
         onPlayerTakeDamage -= PerformOnTakeDamage;
+
+        // Play the death animation (This is just a placeholder/for fun).
+        transform.GetChild(0).transform.GetChild(2).GetComponentInChildren<ParticleSystem>().gameObject.SetActive(true);
+        sprite.enabled = false;
 
         // Close the curtains and wait 2 seconds before loading the game over scene.
         var delayTask = DelayedTaskAsync(() => transition.CloseCurtains(), 2).AsTask();
