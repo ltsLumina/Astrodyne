@@ -1,14 +1,23 @@
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class SlashEffect : MonoBehaviour
 {
     [SerializeField] int attackDamage;
+    [SerializeField] float slashSize;
     [SerializeField] float recoilForce = 10f;
 
-    MeleeComboSystem parent;
+    MeleeSystem parent;
+    SpriteRenderer slashSprite;
 
-    void Start() => parent = GetComponentInParent<MeleeComboSystem>();
+    void Start()
+    {
+        parent      = GetComponentInParent<MeleeSystem>();
+        slashSprite = GetComponent<SpriteRenderer>();
+    }
+
+    void Update() => transform.localScale = new Vector3(slashSize, slashSize, 1f);
 
     // Controlled through an animation event in the slash animation.
     public void OnSlashHit()
@@ -35,7 +44,7 @@ public class SlashEffect : MonoBehaviour
         {
             enemy.TakeDamage(attackDamage = 1); // = 1 debug value
             Vector3 randomizedOffset = parent.MousePlayerOffset + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f));
-            MeleeComboSystem.KnockbackRoutine(enemy.gameObject, parent.MousePlayerOffset + randomizedOffset, recoilForce);
+            MeleeSystem.KnockbackRoutine(enemy.gameObject, parent.MousePlayerOffset + randomizedOffset, recoilForce);
         }
         else { Debug.LogError("No Enemy script found!"); }
     }

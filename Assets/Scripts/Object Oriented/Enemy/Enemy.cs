@@ -13,13 +13,12 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            Debug.Log("HIT PLAYER");
-            var player = other.gameObject;
-            player.GetComponent<Player>().CurrentHealth--;
-            MeleeComboSystem.KnockbackRoutine(player, player.transform.position - transform.position, 10);
-        }
+        if (!other.gameObject.CompareTag("Player")) return;
+
+        Debug.Log("HIT PLAYER");
+        var player = other.gameObject;
+        player.GetComponent<Player>().CurrentHealth--;
+        MeleeSystem.KnockbackRoutine(player, player.transform.position - transform.position, 10);
     }
 
     public void TakeDamage(int damage)

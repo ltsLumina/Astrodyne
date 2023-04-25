@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ public class PlayerAnimationManager : MonoBehaviour
     Dash dash;
     GameObject afterImage;
     ParticleSystem.MainModule parSys;
+    Camera cam;
+    SpriteRenderer sprite;
 
     public static Animator PlayerAnim { get; private set; }
 
@@ -15,11 +18,14 @@ public class PlayerAnimationManager : MonoBehaviour
 
     void Start()
     {
+        PlayerAnim = GetComponent<Animator>();
+
         player     = GetComponentInParent<Player>();
         dash       = GetComponentInParent<Dash>();
         afterImage = transform.GetChild(1).gameObject; // TODO: Make this more robust, rather than accessing by index. //P.S. I tried. Not working regardless.
         parSys     = afterImage.GetComponentInChildren<ParticleSystem>().main;
-        PlayerAnim = GetComponent<Animator>();
+        cam        = Camera.main;
+        sprite     = GetComponentInChildren<SpriteRenderer>();
 
         player.onMoveInputChanged += _ => PlayerAnim.SetBool(IsMoving, player.MoveInput != Vector2.zero);
         dash.onDash += () =>
@@ -28,6 +34,27 @@ public class PlayerAnimationManager : MonoBehaviour
             CameraShake.Instance.ShakeCamera(3f, 0.2f);
             StartCoroutine(AfterImageRoutine());
         };
+    }
+
+    void Update() => FacingDirection();
+
+    void FacingDirection()
+    { // Smoothly rotates player to face mouse.
+        Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+
+        // Flip the sprite if the mouse is on the left side of the player
+        if (mousePos.x < transform.position.x)
+        {
+            sprite.flipX  = true;
+            player.IsFacingRight = false;
+            Debug.Assert(!player.IsFacingRight, "Facing Left!");
+        }
+        else
+        {
+            sprite.flipX  = false;
+            player.IsFacingRight = true;
+            Debug.Assert(player.IsFacingRight, "Facing Right!");
+        }
     }
 
     #region Coroutines

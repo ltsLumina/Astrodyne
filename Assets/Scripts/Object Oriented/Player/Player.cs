@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
     Camera cam;
     SpriteRenderer sprite;
     Transition transition;
-    Weapon weapon;
     #endregion
 
     #region Configurable Parameters
@@ -42,7 +41,7 @@ public class Player : MonoBehaviour
 
     #region Properties
     public Rigidbody2D RB { get; private set; }
-    public bool IsFacingRight { get; private set; } = true;
+    public bool IsFacingRight { get; set; } = true;
     public int CurrentHealth
     {
         get => currentHealth;
@@ -93,13 +92,12 @@ public class Player : MonoBehaviour
         hitbox     = GetComponent<CapsuleCollider2D>();
         sprite     = GetComponentInChildren<SpriteRenderer>();
         transition = FindObjectOfType<Transition>();
-        weapon     = GetComponentInChildren<Weapon>();
 
         // Delegate for when the player takes damage.
         onPlayerTakeDamage += () =>
         {
             PerformOnTakeDamage();
-            weapon.EnterCombat();
+            CombatManager.Instance.EnterCombat();
         };
     }
 
@@ -116,7 +114,6 @@ public class Player : MonoBehaviour
     {
         Boundaries();
         Movement();
-        FaceMouse();
 
         void Boundaries()
         { // Keeps the player within the camera's view.
@@ -143,27 +140,7 @@ public class Player : MonoBehaviour
             Vector2 force = new Vector2(MoveInput.x, MoveInput.y).normalized * moveSpeed;
 
             // adjust RB.drag based on moveInput
-
             RB.AddForce(force, ForceMode2D.Force);
-        }
-
-        void FaceMouse()
-        { // Smoothly rotates player to face mouse.
-            Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-
-            // Flip the sprite if the mouse is on the left side of the player
-            if (mousePos.x < transform.position.x)
-            {
-                sprite.flipX  = true;
-                IsFacingRight = false;
-                Assert(!IsFacingRight, "Facing Left!");
-            }
-            else
-            {
-                sprite.flipX  = false;
-                IsFacingRight = true;
-                Assert(IsFacingRight, "Facing Right!");
-            }
         }
     }
 
