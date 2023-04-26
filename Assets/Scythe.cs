@@ -31,6 +31,5 @@ public class Scythe : MonoBehaviour
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         weaponManager.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        //slashEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 }
