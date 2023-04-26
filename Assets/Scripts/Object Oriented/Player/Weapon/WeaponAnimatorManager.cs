@@ -10,7 +10,7 @@ public class WeaponAnimatorManager : MonoBehaviour
     MeleeSystem meleeSys;
 
     [Header("Cached Hashes")]
-    static readonly int InCombat = Animator.StringToHash("inCombat");
+    readonly static int InCombat = Animator.StringToHash("inCombat");
     #endregion
 
     public static Animator WeaponAnim { get; private set; }
@@ -45,5 +45,6 @@ public class WeaponAnimatorManager : MonoBehaviour
         meleeSys.InstantiatedSlash.GetComponent<SpriteRenderer>().flipY = slashUp;
 
         //WeaponAnim.SetTrigger(slashUp ? "slashUp" : "slashDown");
+        // unused, but I'm keeping it here for reference.
     }
 }

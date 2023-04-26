@@ -6,16 +6,13 @@ using UnityEngine;
 
 public class MeleeSystem : MonoBehaviour
 {
-    [Header("Slash Attack Info"), SerializeField]
+    [Header("Slash Settings"), SerializeField]
     SlashStruct slashEffectInfo;
 
     #region Cached References
     Camera cam;
-    GameObject slash;
-    Animator slashAnimator;
 
     public GameObject InstantiatedSlash { get; private set; }
-    GameObject instantiatedSlash;
 
     [Header("Cached Hashes")]
     readonly static int Attack = Animator.StringToHash("attack");
@@ -40,7 +37,8 @@ public class MeleeSystem : MonoBehaviour
 
     void Update()
     { // Set the slash size to the slashSize parameter.
-        transform.localScale = new (slashEffectInfo.slashSize, slashEffectInfo.slashSize, 1f);
+        if (InstantiatedSlash != null)
+            InstantiatedSlash.transform.localScale = new(slashEffectInfo.slashSize, slashEffectInfo.slashSize, 1f);
 
         // Increment the time since the last melee attack.
         // While the time since last melee is larger than the attackDelay, the player can melee attack.
@@ -105,8 +103,22 @@ public struct SlashStruct
     public GameObject slashPrefab;
     public Transform hitPoint;
 
-    public int AttackDamage { get; set; }
-    public float RecoilForce { get; set; }
+    public int AttackDamage
+    {
+        readonly get => attackDamage;
+        set => attackDamage = value;
+    }
+    public float RecoilForce
+    {
+        readonly get => recoilForce;
+        set => recoilForce = value;
+    }
+
+    [Tooltip("The damage the attack does.")]
+    public int attackDamage;
+
+    [Tooltip("The force of the recoil when attacking.")]
+    public float recoilForce;
 
     // These values are only used in the MeleeSystem.
     [Tooltip("The delay between the attack and the slash effect.")]
@@ -121,7 +133,8 @@ public struct SlashStruct
     [Header("Knockback"), Tooltip("The distance the player dashes when attacking.")]
     public float stepForce;
 
+    [Space(5)]
+
     [Header("Read-only Fields"), SerializeField, ReadOnly]
     public float timeSinceLastMelee;
-
 }

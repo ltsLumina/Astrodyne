@@ -1,17 +1,8 @@
-using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class SlashEffect : MonoBehaviour
 {
-    static MeleeSystem meleeSys;
-    // Sätt ovan variabel från ett annat script en gång i början! :) Så bör den behållas över alla instanser<
-
-    void Start()
-    {
-        meleeSys = FindObjectOfType<MeleeSystem>();
-    }
-
     // Controlled through an animation event in the slash animation.
     public void OnSlashHit()
     {
@@ -40,8 +31,8 @@ public class SlashEffect : MonoBehaviour
             enemy.TakeDamage(slashStruct.AttackDamage = 1); // = 1 debug value
 
             // Generate a random offset for the knockback, then apply it to the enemy.
-            Vector3 randomizedOffset = meleeSys.MousePlayerOffset + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f));
-            MeleeSystem.KnockbackRoutine(enemy.gameObject, meleeSys.MousePlayerOffset + randomizedOffset, slashStruct.RecoilForce);
+            var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
+            MeleeSystem.KnockbackRoutine(enemy.gameObject, enemy.transform.position - transform.position + randomizedOffset, 10);
         }
         else { Debug.LogError("No 'Enemy' script found!"); }
     }

@@ -7,29 +7,26 @@ public class Scythe : MonoBehaviour
 {
     Camera cam;
     Transform playerPos;
-    WeaponAnimatorManager weaponManager;
-    SlashEffect slashEffect;
 
     void Start()
     {
         cam       = Camera.main;
         playerPos = GetComponentInParent<Player>().transform;
-        weaponManager = GetComponentInChildren<WeaponAnimatorManager>();
-        slashEffect = GetComponentInChildren<SlashEffect>();
     }
 
     void Update() => HandleRotation();
 
     void HandleRotation()
     {
+        // Gets the mouse position in the world.
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
 
         // Rotates the object in relation to the mouse position.
         Vector2 direction = mousePos - (Vector2)playerPos.position;
-
         transform.up = direction;
 
+        // Sets the rotation of the weapon.
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        weaponManager.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        WeaponAnimatorManager.WeaponAnim.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward); //TODO: fix so the scythe weapon art doesn't rotate.
     }
 }

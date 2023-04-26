@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     {
         // move towards player
         Vector2 playerPos = FindObjectOfType<Player>().transform.position;
-        transform.position = Vector2.MoveTowards(transform.position, playerPos, 1f * Time.deltaTime);
+        //transform.position = Vector2.MoveTowards(transform.position, playerPos, 1f * Time.deltaTime);
     }
 
     void OnTriggerEnter2D(Collider2D other)

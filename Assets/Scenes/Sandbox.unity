@@ -5723,10 +5723,12 @@ MonoBehaviour:
   slashEffectInfo:
     slashPrefab: {fileID: 3473483447855594552, guid: cd8bfdbe9f03b464391077b0f6a13571, type: 3}
     hitPoint: {fileID: 716392535}
+    attackDamage: 10
+    recoilForce: 5
     attackDelay: 0.45
     attackSpeed: 1
     slashSize: 1
-    knockbackForce: 10
+    stepForce: 4
     timeSinceLastMelee: 0
 --- !u!114 &550530365
 MonoBehaviour:

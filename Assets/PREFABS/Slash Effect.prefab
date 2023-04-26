@@ -33,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2539587754718001089
 MonoBehaviour:
@@ -47,15 +47,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8614eb66059a2fb49a930b4a55c41327, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slashPrefab: {fileID: 0}
-  hitPoint: {fileID: 0}
-  attackDamage: 10
-  attackForce: 0
-  recoilForce: 17.5
-  slashSize: 1
-  attackDelay: 0
-  attackSpeed: 0
-  timeSinceLastMelee: 0
 --- !u!212 &6215345230899001625
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -175,7 +166,10 @@ PolygonCollider2D:
     m_Paths:
     - - {x: 1.0730152, y: 0.949523}
       - {x: 0.4816513, y: 1.3240199}
-      - {x: 0.90548986, y: -0.015002936}
+      - {x: 0.94558513, y: 0.561077}
+      - {x: 1.1251125, y: 0.27840185}
+      - {x: 1.1575515, y: -0.12302944}
+      - {x: 0.9929232, y: -0.6093241}
       - {x: 0.4368177, y: -1.2030953}
       - {x: 0.99062026, y: -1.0629785}
       - {x: 1.3950415, y: -0.6256151}
