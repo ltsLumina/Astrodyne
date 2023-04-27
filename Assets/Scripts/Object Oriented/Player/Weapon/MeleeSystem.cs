@@ -72,7 +72,6 @@ public class MeleeSystem : MonoBehaviour
         float angle = Mathf.Atan2(MousePlayerOffset.y, MousePlayerOffset.x) * Mathf.Rad2Deg;
         InstantiatedSlash.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
-
         // Set the parent of the slash effect to the player.
         InstantiatedSlash.transform.parent = FindObjectOfType<Player>().transform;
 

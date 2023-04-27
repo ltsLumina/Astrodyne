@@ -3,7 +3,7 @@ using Random = UnityEngine.Random;
 
 public class SlashEffect : MonoBehaviour
 {
-    // Controlled through an animation event in the slash animation.
+    // Controlled through an animation event in the slash animation. (Assets\Animations\Player\Slash\Slash.anim)
     public void OnSlashHit()
     {
         var collider = GetComponent<PolygonCollider2D>();
@@ -32,7 +32,7 @@ public class SlashEffect : MonoBehaviour
 
             // Generate a random offset for the knockback, then apply it to the enemy.
             var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
-            MeleeSystem.KnockbackRoutine(enemy.gameObject, enemy.transform.position - transform.position + randomizedOffset, 10);
+            MeleeSystem.KnockbackRoutine(enemy.gameObject, enemy.transform.position - transform.position + randomizedOffset, slashStruct.RecoilForce); //TODO: slash struct values are 0.
         }
         else { Debug.LogError("No 'Enemy' script found!"); }
     }

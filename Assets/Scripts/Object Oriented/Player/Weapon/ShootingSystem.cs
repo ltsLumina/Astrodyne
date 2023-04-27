@@ -83,7 +83,7 @@ public class ShootingSystem : MonoBehaviour
         // Set the position to the shooting position plus an offset relative to the mouse position.
         Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
         
-        //TODO: THIS HAS BEEN COMMENTED OUT FOR TIME BEING, AS THE SLASH EFFECT IS IN THE WORKS.
+        //TODO: THIS HAS BEEN COMMENTED OUT FOR TIME BEING, AS THE SLASH EFFECT IS IN THE WORKS. ^^ ABOVE CODE IS AFFECTED TOO
         //pooledBullet.transform.position = GetComponentInChildren<SlashEffect>().transform.position + (mousePos - transform.position).normalized * 0.5f;
 
         pooledBullet.transform.rotation = transform.rotation;
