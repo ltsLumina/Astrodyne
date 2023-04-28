@@ -98,7 +98,7 @@ namespace Essentials
         /// <param name="delayInSeconds">The delay before running the method.</param>
         /// <param name="debugLog">Whether or not to debug the waiting message and the completion message.</param>
         /// <param name="onComplete">An action to be completed after the initial action is finished. Not required to be used.</param>
-        [Obsolete("This method is not finished or has been deprecated. Use 'DoAfterDelayAsync' instead.")]
+        [Obsolete("This method is not finished or has been deprecated. Use 'DelayedTaskAsync' instead.")]
         public static void DelayedTask(
             Action action, int delayInSeconds, bool debugLog = false, Action onComplete = null)
         {
