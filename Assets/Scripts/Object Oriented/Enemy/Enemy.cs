@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// TODO: REWORK THE ENEMY SCRIPT
+/// </summary>
 public class Enemy : MonoBehaviour
 {
     [SerializeField] int health = 100;
@@ -18,7 +21,7 @@ public class Enemy : MonoBehaviour
         Debug.Log("HIT PLAYER");
         var player = other.gameObject;
         player.GetComponent<Player>().CurrentHealth--;
-        MeleeSystem.KnockbackRoutine(player, player.transform.position - transform.position, 10);
+        MeleeSystem.KnockbackRoutine(player, player.transform.position - transform.position);
     }
 
     public void TakeDamage(int damage)

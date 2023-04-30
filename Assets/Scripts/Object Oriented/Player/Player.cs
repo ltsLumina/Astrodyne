@@ -56,7 +56,6 @@ public class Player : MonoBehaviour
 
             IsDead = currentHealth <= 0;
             if (IsDead) HandleDeath();
-
         }
     }
     public bool IsDead

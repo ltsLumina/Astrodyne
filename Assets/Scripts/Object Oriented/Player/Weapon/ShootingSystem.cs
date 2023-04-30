@@ -23,7 +23,10 @@ public class ShootingSystem : MonoBehaviour
 
 
     #region Cached References
+    [Header("Cached References")]
+    [SerializeField] GameObject bulletPrefab;
     Camera cam;
+    MeleeSystem meleeSys;
     ObjectPool bulletPool;
     #endregion
 
@@ -35,14 +38,14 @@ public class ShootingSystem : MonoBehaviour
     {
         // Cache references.
         cam = Camera.main;
-        bulletPool = FindObjectOfType<ObjectPool>();
+        meleeSys = GetComponent<MeleeSystem>();
+
+        // Create the bullet pool and set it up
+        bulletPool = ObjectPoolManager.CreateNewPool(bulletPrefab, 7);
+        bulletPool.gameObject.name = "Bullet Pool";
 
         // Subscribe to the onShoot event.
-        onShoot += () =>
-        {
-            Shooting();
-            CombatManager.Instance.EnterCombat();
-        };
+        onShoot += Shooting;
 
         // Assertions:
         // Return bullet to pool after bulletLifetime seconds. Also asserting that the bulletLifetime is greater than 0.
@@ -63,8 +66,12 @@ public class ShootingSystem : MonoBehaviour
 
     void Shooting() //TODO: THERE IS KNOCKBACK? // figured it out, the bullet is hitting the player and pushing them back.
     {
+        // Enter combat.
+        CombatManager.Instance.EnterCombat();
+
         // Initialize the bullet before method call to to avoid closure allocation.
         GameObject pooledBullet = bulletPool.GetPooledObject();
+        Debug.Log(pooledBullet);
 
         // If the pooled bullet is null, return.
         try
@@ -82,10 +89,9 @@ public class ShootingSystem : MonoBehaviour
 
         // Set the position to the shooting position plus an offset relative to the mouse position.
         Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        
-        //TODO: THIS HAS BEEN COMMENTED OUT FOR TIME BEING, AS THE SLASH EFFECT IS IN THE WORKS. ^^ ABOVE CODE IS AFFECTED TOO
-        //pooledBullet.transform.position = GetComponentInChildren<SlashEffect>().transform.position + (mousePos - transform.position).normalized * 0.5f;
 
+        // Set the bullet's position and rotation.
+        pooledBullet.transform.position = meleeSys.HitPoint.transform.position + (mousePos - transform.position).normalized * 0.5f;
         pooledBullet.transform.rotation = transform.rotation;
 
         // Add force to the bullet.

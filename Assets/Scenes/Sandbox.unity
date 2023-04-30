@@ -252,52 +252,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &241201574
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 241201576}
-  - component: {fileID: 241201575}
-  m_Layer: 0
-  m_Name: Bullet Pool
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &241201575
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 241201574}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 559aadeac57242249b64dfb6012c816a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
-  startAmount: 7
---- !u!4 &241201576
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 241201574}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 587707809}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &351146941
 GameObject:
   m_ObjectHideFlags: 0
@@ -5724,12 +5678,13 @@ MonoBehaviour:
     slashPrefab: {fileID: 3473483447855594552, guid: cd8bfdbe9f03b464391077b0f6a13571, type: 3}
     hitPoint: {fileID: 716392535}
     attackDamage: 10
-    recoilForce: 10
+    recoilForce: 25
     attackDelay: 0.45
     attackSpeed: 1
     slashSize: 1
     stepForce: 4
     timeSinceLastMelee: 0
+  hitPoint: {fileID: 716392535}
 --- !u!114 &550530365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5746,6 +5701,7 @@ MonoBehaviour:
   bulletLifetime: 5
   bulletForce: 25
   timeSinceLastShot: 0
+  bulletPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
 --- !u!114 &550530366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5858,7 +5814,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 241201576}
   - {fileID: 1213995914}
   - {fileID: 1093448858}
   m_Father: {fileID: 0}

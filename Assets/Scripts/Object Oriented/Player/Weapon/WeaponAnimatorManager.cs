@@ -42,7 +42,7 @@ public class WeaponAnimatorManager : MonoBehaviour
     {
         slashUp = !slashUp;
 
-        meleeSys.InstantiatedSlash.GetComponent<SpriteRenderer>().flipY = slashUp;
+        //meleeSys.InstantiatedSlash.GetComponent<SpriteRenderer>().flipY = slashUp;
 
         //WeaponAnim.SetTrigger(slashUp ? "slashUp" : "slashDown");
         // unused, but I'm keeping it here for reference.

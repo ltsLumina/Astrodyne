@@ -32,7 +32,7 @@ public class SlashEffect : MonoBehaviour
 
             // Generate a random offset for the knockback, then apply it to the enemy.
             var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
-            MeleeSystem.KnockbackRoutine(enemy.gameObject, enemy.transform.position - transform.position + randomizedOffset, slashStruct.RecoilForce); //TODO: slash struct values are 0.
+            MeleeSystem.KnockbackRoutine(enemy.gameObject, enemy.transform.position - transform.position + randomizedOffset, slashStruct.RecoilForce);
         }
         else { Debug.LogError("No 'Enemy' script found!"); }
     }

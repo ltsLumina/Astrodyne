@@ -1,21 +1,18 @@
 #region
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 #endregion
 
 public static class ObjectPoolManager
 {
-    readonly static List<ObjectPool> objectPools = new ();
+    static List<ObjectPool> objectPools = new();
 
     static Transform objectPoolParent;
-
     static Transform ObjectPoolParent
     {
         get
         {
-            if (objectPoolParent == null)
-                objectPoolParent = new GameObject("--- Object Pools ---").transform;
+            if (objectPoolParent == null) objectPoolParent = new GameObject("--- Object Pools ---").transform;
 
             return objectPoolParent;
         }
@@ -39,7 +36,7 @@ public static class ObjectPoolManager
     /// <returns>The pool that was created.</returns>
     public static ObjectPool CreateNewPool(GameObject objectPrefab, int startAmount = 20)
     {
-        ObjectPool newObjectPool = new GameObject().AddComponent<ObjectPool>();
+        var newObjectPool = new GameObject().AddComponent<ObjectPool>();
         newObjectPool.SetUpPool(objectPrefab, startAmount);
 
         return newObjectPool;
@@ -53,11 +50,9 @@ public static class ObjectPoolManager
     /// <returns></returns>
     public static ObjectPool FindObjectPool(GameObject objectPrefab)
     {
-        var objectPool = objectPools.FirstOrDefault();
-        if (objectPool != null)
+        foreach (ObjectPool objectPool in objectPools)
         {
-            Debug.Log("Found the pool!");
-            return objectPool;
+            if (objectPool.GetPooledObjectPrefab() == objectPrefab) return objectPool;
         }
 
         Debug.LogWarning("That object is NOT yet pooled! Creating a new pool...");

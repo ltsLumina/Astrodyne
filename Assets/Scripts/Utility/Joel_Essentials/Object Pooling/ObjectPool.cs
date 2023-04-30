@@ -1,20 +1,14 @@
-#region
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-#endregion
 
 public class ObjectPool : MonoBehaviour
 {
     [SerializeField] GameObject objectPrefab;
     [SerializeField] int startAmount;
 
-    static readonly List<GameObject> pooledObjects = new();
+    Queue<GameObject> pooledObjects = new();
 
-    void Awake() =>
-
-        // Clearing the list of pooled objects in Awake in case the list is not empty when the game is restarted.
-        pooledObjects.Clear();
+    void Awake() => gameObject.name = objectPrefab.name + " (Pool)";
 
     void Start()
     {
@@ -22,62 +16,47 @@ public class ObjectPool : MonoBehaviour
         InstantiateStartAmount();
     }
 
-    /// <summary>
-    ///     Basically a constructor.
-    /// </summary>
-    /// <param name="objectPrefab"></param>
-    /// <param name="startAmount"></param>
-    public void SetUpPool(GameObject objectPrefab, int startAmount)
-    {
-        this.objectPrefab = objectPrefab;
-        this.startAmount  = startAmount;
-
-        gameObject.name = objectPrefab.name + " (Pool)";
-    }
-
-    /// <summary>
-    ///     Instantiates the specified number of starting objects for the pool.
-    /// </summary>
     void InstantiateStartAmount()
     {
         for (int i = 0; i < startAmount; i++) { CreatePooledObject(); }
     }
 
-    /// <summary>
-    ///     Instantiates an object, adds it to the pool and makes it inactive.
-    /// </summary>
-    /// <returns>The object that was created.</returns>
-    public GameObject CreatePooledObject()
+    public void SetUpPool(GameObject objectPrefab, int startAmount)
+    {
+        pooledObjects = new Queue<GameObject>();
+
+        for (int i = 0; i < startAmount; i++)
+        {
+            GameObject obj = Instantiate(objectPrefab);
+            obj.SetActive(false);
+            pooledObjects.Enqueue(obj);
+        }
+    }
+
+
+    GameObject CreatePooledObject()
     {
         GameObject newObject = Instantiate(objectPrefab, transform, true);
         newObject.SetActive(false);
-        pooledObjects.Add(newObject);
+        pooledObjects.Enqueue(newObject);
         return newObject;
     }
 
-    /// <summary>
-    ///     Returns an object from the pool.
-    /// </summary>
-    /// <param name="setActive">Depicts if the object should be active on return.</param>
-    /// <returns></returns>
     public GameObject GetPooledObject(bool setActive = false)
     {
         GameObject objectToReturn = null;
 
-        foreach (GameObject pooledObject in pooledObjects.Where(pooledObject => !pooledObject.activeInHierarchy))
-        {
-            objectToReturn = pooledObject;
-        }
-
-        if (objectToReturn == null) objectToReturn = CreatePooledObject();
+        objectToReturn = pooledObjects.Count > 0 ? pooledObjects.Dequeue() : CreatePooledObject();
 
         objectToReturn.SetActive(setActive);
         return objectToReturn;
     }
 
-    /// <summary>
-    ///     Returns the prefab of the object this pool contains.
-    /// </summary>
-    /// <returns></returns>
+    public void ReturnObjectToPool(GameObject obj)
+    {
+        obj.SetActive(false);
+        pooledObjects.Enqueue(obj);
+    }
+
     public GameObject GetPooledObjectPrefab() => objectPrefab;
 }
