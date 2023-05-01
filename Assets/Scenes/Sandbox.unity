@@ -5636,8 +5636,8 @@ GameObject:
   m_Component:
   - component: {fileID: 550530361}
   - component: {fileID: 550530366}
-  - component: {fileID: 550530364}
-  - component: {fileID: 550530365}
+  - component: {fileID: 550530368}
+  - component: {fileID: 550530367}
   m_Layer: 0
   m_Name: Scythe (Weapon)
   m_TagString: Untagged
@@ -5662,46 +5662,6 @@ Transform:
   m_Father: {fileID: 431302118}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &550530364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 550530359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb9e3091368bea047a44d9d751f0ca7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slashEffectInfo:
-    slashPrefab: {fileID: 3473483447855594552, guid: cd8bfdbe9f03b464391077b0f6a13571, type: 3}
-    hitPoint: {fileID: 716392535}
-    attackDamage: 10
-    recoilForce: 25
-    attackDelay: 0.45
-    attackSpeed: 1
-    slashSize: 1
-    stepForce: 4
-    timeSinceLastMelee: 0
-  hitPoint: {fileID: 716392535}
---- !u!114 &550530365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 550530359}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da84e085a0c94693ba829d80d460c908, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fireRate: 0.3
-  bulletLifetime: 5
-  bulletForce: 25
-  timeSinceLastShot: 0
-  bulletPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
 --- !u!114 &550530366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5714,6 +5674,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd201f6276c67344a8455d0c210873d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &550530367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550530359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da84e085a0c94693ba829d80d460c908, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
+  attackRate: 0.1
+  attackLifetime: 5
+  timeSinceLastAttack: 0
+  bulletInfo:
+    bulletDamage: 1
+    bulletForce: 10
+--- !u!114 &550530368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550530359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92ca88f083ca42b8a11578be7deaa867, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPrefab: {fileID: 3473483447855594552, guid: cd8bfdbe9f03b464391077b0f6a13571, type: 3}
+  attackRate: 0.45
+  attackLifetime: 0.45
+  timeSinceLastAttack: 0
+  slashInfo:
+    slashDamage: 1
+    knockbackForce: 15
+    slashAnimSpeed: 1
+    slashSize: 1
+    stepForce: 0
 --- !u!1 &554949525
 GameObject:
   m_ObjectHideFlags: 0
@@ -5797,7 +5798,7 @@ GameObject:
   - component: {fileID: 587707809}
   m_Layer: 0
   m_Name: Management
-  m_TagString: Utlity
+  m_TagString: Utility
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16711,7 +16712,7 @@ GameObject:
   - component: {fileID: 1188419712}
   m_Layer: 0
   m_Name: Cameras
-  m_TagString: Utlity
+  m_TagString: Utility
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

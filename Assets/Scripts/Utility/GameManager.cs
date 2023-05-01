@@ -6,6 +6,7 @@ using ReadOnly = Essentials.ReadOnlyAttribute;
 
 public class GameManager : SingletonPersistent<GameManager>
 {
+    // Singleton reference to the player.
     public Player Player { get; private set; }
 
     [Header("Score"), ReadOnly, SerializeField]
@@ -23,5 +24,16 @@ public class GameManager : SingletonPersistent<GameManager>
     {
         if (Input.GetKeyDown(KeyCode.Backspace))
             Essentials.UsefulMethods.DelayedTaskAsync(ReloadScene, 1.5f).AsTask();
+    }
+
+    /// <summary>
+    ///     Knockback any gameobject with a rigidbody2D.
+    /// </summary>
+    /// <remarks> Keep in mind that the direction parameter already is normalized. </remarks>
+    public static void KnockbackRoutine(GameObject gameObject, Vector2 direction, float force = 10f)
+    {
+        var rigidbody = gameObject.GetComponent<Rigidbody2D>();
+        if (rigidbody != null)
+            rigidbody.AddForce(direction.normalized * force, ForceMode2D.Impulse);
     }
 }

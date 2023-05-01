@@ -1,78 +1,26 @@
-#region
+﻿#region
 using System;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
-using Essentials;
 using UnityEngine;
+using static GameManager;
 #endregion
 
-public class MeleeSystem : MonoBehaviour
+public class MeleeSystem : WeaponSystem
 {
-    [Header("Slash Settings"), SerializeField, Space(10)]
-    SlashStruct slashEffectInfo;
+    [Header("Slashing Parameters"), SerializeField, Space(10)]
+    SlashParameters slashInfo;
 
-    #region Cached References
-    [Header("Cached References")]
-    [SerializeField] Transform hitPoint;
-    Camera cam;
-    ObjectPool slashPool;
+    // Cached Hashes
+    readonly static int AttackID = Animator.StringToHash("attack");
 
-    [Header("Cached Hashes")]
-    readonly static int Attack = Animator.StringToHash("attack");
-    #endregion
+    protected override bool CanAttack() =>
+        Input.GetMouseButton(1) && timeSinceLastAttack > attackRate && attackPool != null;
 
-    // Delegate for when the player melee attacks.
-    public delegate void OnMeleeAttack();
-    public event OnMeleeAttack onMeleeAttack;
-
-    #region Properties
-    // Returns the direction of the mouse relative to the player.
-    public Vector3 MousePlayerOffset => (Input.mousePosition - cam.WorldToScreenPoint(transform.position)).normalized;
-
-    public Transform HitPoint => hitPoint;
-    #endregion
-
-    void Start()
+    protected override void Attack()
     {
-        cam       = Camera.main;
-
-        // Initialize the object pool.
-        Debug.Log(slashEffectInfo.slashPrefab.name);
-        slashPool = ObjectPoolManager.CreateNewPool(slashEffectInfo.slashPrefab, 4);
-        slashPool.gameObject.name = "Slash Pool";
-
-        // Subscribe to the onMeleeAttack event and set the animation speed if the event is invoked.
-        onMeleeAttack += InstantiateSlash;
-    }
-
-    void Update()
-    { // Set the slash size to the slashSize parameter.
-        //TODO: Fix VVV
-        // if (InstantiatedSlash != null)
-        //     InstantiatedSlash.transform.localScale = new(slashEffectInfo.slashSize, slashEffectInfo.slashSize, 1f);
-
-        // Increment the time since the last melee attack.
-        // While the time since last melee is larger than the attackDelay, the player can melee attack.
-        MeleeCombat();
-    }
-
-    void MeleeCombat()
-    {
-        slashEffectInfo.timeSinceLastMelee += Time.deltaTime;
-
-        if (!Input.GetMouseButton(1) || !(slashEffectInfo.timeSinceLastMelee > slashEffectInfo.attackDelay)) return;
-
-        // Invoke the onMeleeAttack event and reset the timer.
-        onMeleeAttack?.Invoke();
-        slashEffectInfo.timeSinceLastMelee = 0;
-    }
-
-    void InstantiateSlash()
-    {
-        CombatManager.Instance.EnterCombat();
+        base.Attack();
 
         // Initialize the bullet before method call to to avoid closure allocation.
-        GameObject pooledSlash = slashPool.GetPooledObject();
+        GameObject pooledSlash = attackPool.GetPooledObject();
 
         // If the pooled bullet is null, return.
         try
@@ -85,101 +33,56 @@ public class MeleeSystem : MonoBehaviour
         }
 
         // Activate the slash, and set its position and rotation.
-        pooledSlash = slashPool.GetPooledObject(true);
+        pooledSlash = attackPool.GetPooledObject(true);
 
-        pooledSlash.transform.position  = HitPoint.position;
+        pooledSlash.transform.position = Scythe.HitPoint.position;
         pooledSlash.transform.rotation = transform.rotation; //TODO: This is probably wrong.
 
-        pooledSlash.GetComponent<Animator>().SetTrigger(Attack); //TODO "pooledSlash" is apparently a bullet??
-        pooledSlash.GetComponent<Animator>().speed = slashEffectInfo.attackSpeed;
+        pooledSlash.GetComponent<Animator>().SetTrigger(AttackID);
+        pooledSlash.GetComponent<Animator>().speed = slashInfo.slashAnimSpeed;
+        pooledSlash.transform.localScale = new Vector2(slashInfo.slashSize, slashInfo.slashSize);
 
         // //Rotate the slash effect depending on the direction of the mouse.
         float angle = Mathf.Atan2(MousePlayerOffset.y, MousePlayerOffset.x) * Mathf.Rad2Deg;
         pooledSlash.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
-        // // Set the parent of the slash effect to the player.
-        //pooledSlash.transform.parent = FindObjectOfType<Player>().transform;
+        // Set the parent of the slash effect to the player.
+        pooledSlash.transform.parent = FindObjectOfType<Player>().transform;
 
-        Task delayTask = UsefulMethods.DelayedTaskAsync(() => pooledSlash.SetActive(false), 0.45f).AsTask();
-        delayTask.ContinueWith(_ => Debug.Log("Slash returned to pool!"));
-
-        // --- //
-
-
-        // Experimental slash effect that instantiates a slash prefab.
-        // Instantiates the slash, plays the animation, and destroys the slash after a short delay.
-        // InstantiatedSlash =
-        //     Instantiate(slashEffectInfo.slashPrefab, slashEffectInfo.hitPoint.position, Quaternion.identity);
-        //
-        // InstantiatedSlash.GetComponent<Animator>().SetTrigger(Attack);
-        // InstantiatedSlash.GetComponent<Animator>().speed = slashEffectInfo.attackSpeed;
-        //
-        // //Rotate the slash effect depending on the direction of the mouse.
-        // float angle = Mathf.Atan2(MousePlayerOffset.y, MousePlayerOffset.x) * Mathf.Rad2Deg;
-        // InstantiatedSlash.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        //
-        // // Set the parent of the slash effect to the player.
-        // InstantiatedSlash.transform.parent = FindObjectOfType<Player>().transform;
-        //
-        // //Destroy the slash effect after a short delay.
-        // // Keep in mind that this is temporary, and will be replaced by a object pool.
-        // Destroy(InstantiatedSlash, 0.45f);
+        PostAttack(pooledSlash);
 
         // Dash a short distance towards the mouse to make the attack feel more impactful.
-        KnockbackRoutine(gameObject.transform.parent.gameObject, MousePlayerOffset, slashEffectInfo.stepForce);
-    }
-
-    /// <summary>
-    ///     Knockback any gameobject with a rigidbody2D.
-    /// </summary>
-    /// <remarks> Keep in mind that the direction parameter already is normalized. </remarks>
-    public static void KnockbackRoutine(GameObject gameObject, Vector2 direction, float force = 10f)
-    {
-        var rigidbody = gameObject.GetComponent<Rigidbody2D>();
-        if (rigidbody != null)
-            rigidbody.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+        KnockbackRoutine(gameObject.transform.parent.gameObject, MousePlayerOffset, slashInfo.stepForce);
     }
 }
 
 [Serializable]
-public struct SlashStruct
+public struct SlashParameters
 { // A struct with data for the slash effect.
 
-    public GameObject slashPrefab;
-    public Transform hitPoint;
-
-    public int AttackDamage
+    public int SlashDamage
     {
-        readonly get => attackDamage;
-        set => attackDamage = value;
+        readonly get => slashDamage;
+        set => slashDamage = value;
     }
-    public float RecoilForce
+    public float KnockbackForce
     {
-        readonly get => recoilForce;
-        set => recoilForce = value;
+        readonly get => knockbackForce;
+        set => knockbackForce = value;
     }
 
     [Tooltip("The damage the attack does.")]
-    public int attackDamage;
+    public int slashDamage;
 
     [Tooltip("The force of the recoil when attacking.")]
-    public float recoilForce;
-
-    // These values are only used in the MeleeSystem.
-    [Tooltip("The delay between the attack and the slash effect.")]
-    public float attackDelay;
+    public float knockbackForce;
 
     [Tooltip("The speed of the slash effect animation. Scales with the attack delay.")]
-    public float attackSpeed;
+    public float slashAnimSpeed;
 
     [Tooltip("The size of the slash effect.")]
     public float slashSize;
 
     [Header("Knockback"), Tooltip("The distance the player dashes when attacking.")]
     public float stepForce;
-
-    [Space(5)]
-
-    [Header("Read-only Fields"), SerializeField, ReadOnly]
-    public float timeSinceLastMelee;
 }

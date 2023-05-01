@@ -12,7 +12,11 @@ public static class ObjectPoolManager
     {
         get
         {
-            if (objectPoolParent == null) objectPoolParent = new GameObject("--- Object Pools ---").transform;
+            if (objectPoolParent == null)
+            {
+                var objectPoolParentGameObject = new GameObject("--- Object Pools ---");
+                objectPoolParent = objectPoolParentGameObject.transform;
+            }
 
             return objectPoolParent;
         }
@@ -24,6 +28,12 @@ public static class ObjectPoolManager
     /// <param name="objectPool"></param>
     public static void AddExistingPool(ObjectPool objectPool)
     {
+        if (objectPool == null)
+        {
+            Debug.LogError("Object pool cannot be null!");
+            return;
+        }
+
         objectPools.Add(objectPool);
         objectPool.transform.parent = ObjectPoolParent;
     }
@@ -36,11 +46,20 @@ public static class ObjectPoolManager
     /// <returns>The pool that was created.</returns>
     public static ObjectPool CreateNewPool(GameObject objectPrefab, int startAmount = 20)
     {
+        if (objectPrefab == null)
+        {
+            Debug.LogError("Object prefab cannot be null!");
+            return null;
+        }
+
         var newObjectPool = new GameObject().AddComponent<ObjectPool>();
         newObjectPool.SetUpPool(objectPrefab, startAmount);
 
         return newObjectPool;
     }
+
+    // Dictionary to cache the object pools by prefab for faster lookup.
+    readonly static Dictionary<GameObject, ObjectPool> ObjectPoolLookup = new();
 
     /// <summary>
     ///     Returns the pool containing the specified object prefab.
@@ -50,12 +69,17 @@ public static class ObjectPoolManager
     /// <returns></returns>
     public static ObjectPool FindObjectPool(GameObject objectPrefab)
     {
-        foreach (ObjectPool objectPool in objectPools)
+        if (objectPrefab == null)
         {
-            if (objectPool.GetPooledObjectPrefab() == objectPrefab) return objectPool;
+            Debug.LogError("Object prefab cannot be null!");
+            return null;
         }
 
+        if (ObjectPoolLookup.TryGetValue(objectPrefab, out ObjectPool objectPool)) return objectPool;
+
         Debug.LogWarning("That object is NOT yet pooled! Creating a new pool...");
-        return CreateNewPool(objectPrefab);
+        objectPool                     = CreateNewPool(objectPrefab);
+        ObjectPoolLookup[objectPrefab] = objectPool;
+        return objectPool;
     }
 }

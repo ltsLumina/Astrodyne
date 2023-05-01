@@ -5,13 +5,18 @@ using UnityEngine;
 /// </summary>
 public class Scythe : MonoBehaviour
 {
+    #region Cached References
     Camera cam;
     Transform playerPos;
+    #endregion
+
+    public static Transform HitPoint { get; private set; }
 
     void Start()
     {
         cam       = Camera.main;
         playerPos = GetComponentInParent<Player>().transform;
+        HitPoint  = transform.GetChild(1); // Keep in mind that this is a GetChild call, so it's not very efficient.
     }
 
     void Update() => HandleRotation();

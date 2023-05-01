@@ -1,4 +1,5 @@
 using UnityEngine;
+using static GameManager;
 
 /// <summary>
 /// TODO: REWORK THE ENEMY SCRIPT
@@ -21,7 +22,7 @@ public class Enemy : MonoBehaviour
         Debug.Log("HIT PLAYER");
         var player = other.gameObject;
         player.GetComponent<Player>().CurrentHealth--;
-        MeleeSystem.KnockbackRoutine(player, player.transform.position - transform.position);
+        KnockbackRoutine(player, player.transform.position - transform.position, 25);
     }
 
     public void TakeDamage(int damage)

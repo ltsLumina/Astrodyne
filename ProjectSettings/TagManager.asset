@@ -7,9 +7,9 @@ TagManager:
   - VCam
   - Bullet
   - Orb
-  - Utlity
   - Weapon
   - Enemy
+  - Utility
   layers:
   - Default
   - TransparentFX

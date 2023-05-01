@@ -24,7 +24,7 @@ public class WeaponAnimatorManager : MonoBehaviour
         meleeSys = scytheGameObject.GetComponent<MeleeSystem>();
 
         // Subscribe to events.
-        meleeSys.onMeleeAttack += SlashDirection;
+        meleeSys.onAttack += SlashDirection;
     }
 
     void Update()
