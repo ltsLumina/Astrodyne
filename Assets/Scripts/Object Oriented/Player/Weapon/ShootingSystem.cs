@@ -20,6 +20,9 @@ public class ShootingSystem : WeaponSystem
         set => bulletForce = value;
     }
 
+    // The currently active slash effect. Used to flip the slash effect depending on the direction of the mouse.
+    public GameObject ActiveBullet { get; private set; }
+
     protected override bool CanAttack() =>
         Input.GetMouseButton(0) && TimeSinceLastAttack > attackRate && AttackPool != null;
 
@@ -42,8 +45,9 @@ public class ShootingSystem : WeaponSystem
         }
 
         // Activate the bullet, and set its position and rotation.
-        pooledBullet.GetComponent<TrailRenderer>().Clear(); //TODO: don't like this but it works. Tried to make a work around but it proved to be too much work.
-        pooledBullet.SetActive(true);
+        //pooledBullet.GetComponent<TrailRenderer>().Clear(); //TODO: don't like this but it works. Tried to make a work around but it proved to be too much work.
+        pooledBullet = AttackPool.GetPooledObject(true);
+        ActiveBullet = pooledBullet;
 
         // Set the position to the shooting position plus an offset relative to the mouse position.
         Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
@@ -59,5 +63,17 @@ public class ShootingSystem : WeaponSystem
 
         // Return the bullet to the objectPool and reset the attack timer.
         PostAttack(pooledBullet);
+    }
+
+    // TODO: bro idk what im doing im writing garbage code rn
+    protected override void PostAttack(GameObject pooledAttack)
+    {
+        var pooledAttackTrail = pooledAttack.GetComponent<TrailRenderer>();
+
+        pooledAttackTrail.Clear();
+        pooledAttackTrail.startColor = new Color(0.36f, 0.49f, 0.69f);
+        pooledAttack.transform.localScale = new Vector2(0.75f, 0.75f);
+
+        base.PostAttack(pooledAttack);
     }
 }

@@ -5691,8 +5691,8 @@ MonoBehaviour:
   attackLifetime: 5
   timeSinceLastAttack: 0
   bulletDamage: 1
-  bulletForce: 10
-  bloom: 0
+  bulletForce: 25
+  bloom: 1
 --- !u!114 &550530368
 MonoBehaviour:
   m_ObjectHideFlags: 0

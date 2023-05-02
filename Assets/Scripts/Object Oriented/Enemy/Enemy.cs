@@ -17,12 +17,23 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.gameObject.CompareTag("Player")) return;
+        switch (other.gameObject.tag)
+        {
+            case "Player":
+                Debug.Log("HIT PLAYER");
+                var player = other.gameObject;
+                player.GetComponent<Player>().CurrentHealth--;
+                KnockbackRoutine(player, player.transform.position - transform.position, 25);
+                break;
 
-        Debug.Log("HIT PLAYER");
-        var player = other.gameObject;
-        player.GetComponent<Player>().CurrentHealth--;
-        KnockbackRoutine(player, player.transform.position - transform.position, 25);
+            case "Bullet":
+                Debug.Log("HIT BY BULLET");
+                var bullet = other.gameObject;
+                health--;
+                bullet.SetActive(false);
+                KnockbackRoutine(gameObject, transform.position - bullet.transform.position, 7.5f);
+                break;
+        }
     }
 
     public void TakeDamage(int damage)

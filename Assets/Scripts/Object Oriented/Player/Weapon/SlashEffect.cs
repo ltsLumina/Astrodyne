@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static GameManager;
 using Random = UnityEngine.Random;
@@ -55,13 +56,15 @@ public class SlashEffect : MonoBehaviour
     {
         var bulletComponent = other.gameObject;
 
-        var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
-        KnockbackRoutine(bulletComponent.gameObject, bulletComponent.transform.position - transform.position + randomizedOffset, 25);
+        var randomizedOffset = new Vector3(Random.Range(-20f, 20f), Random.Range(-20f, 20f)); //TODO: Readjust this/re-code it.
+        KnockbackRoutine(bulletComponent.gameObject, bulletComponent.transform.position - transform.position + randomizedOffset, 10);
 
         // Activate multiple bullets.
         for (int i = 0; i < 3; i++)
         {
-            shootingSys.Attack(); //TODO: i need to add spread to the bullets fired.
+            shootingSys.ActiveBullet.GetComponent<TrailRenderer>().startColor = Color.red;
+            shootingSys.ActiveBullet.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            shootingSys.Attack();
         }
 
         CameraShake.Instance.ShakeCamera(5f, 0.2f);

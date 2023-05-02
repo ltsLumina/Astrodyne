@@ -39,7 +39,7 @@ public class MeleeSystem : WeaponSystem
     public GameObject ActiveSlash { get; private set; }
 
     protected override bool CanAttack() =>
-        Input.GetMouseButton(1) && TimeSinceLastAttack > attackRate && AttackPool != null;
+        (Input.GetMouseButton(1) || Input.GetKeyDown(KeyCode.V)) && TimeSinceLastAttack > attackRate && AttackPool != null;
 
     public override void Attack()
     {
@@ -69,7 +69,7 @@ public class MeleeSystem : WeaponSystem
         pooledSlash.GetComponent<Animator>().speed = slashAnimSpeed;
         pooledSlash.transform.localScale = new Vector2(slashSize, slashSize);
 
-        // //Rotate the slash effect depending on the direction of the mouse.
+        //Rotate the slash effect depending on the direction of the mouse.
         float angle = Mathf.Atan2(MousePlayerOffset.y, MousePlayerOffset.x) * Mathf.Rad2Deg;
         pooledSlash.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 

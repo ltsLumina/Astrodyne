@@ -14,7 +14,7 @@ public class PlayerAnimationManager : MonoBehaviour
     public static Animator PlayerAnim { get; private set; }
 
     [Header("Cached Hashes")]
-    static readonly int IsMoving = Animator.StringToHash("isMoving");
+    readonly static int IsMoving = Animator.StringToHash("isMoving");
 
     void Start()
     {
