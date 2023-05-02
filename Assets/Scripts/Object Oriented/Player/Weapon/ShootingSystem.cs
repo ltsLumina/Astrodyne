@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// Fires bullets from the player's weapon to the mouse position.
@@ -7,18 +8,27 @@ using UnityEngine;
 /// </summary>
 public class ShootingSystem : WeaponSystem
 {
-    [Header("Shooting Parameters"), SerializeField, Space(10)]
-    BulletParameters bulletInfo;
+    [Header("Shooting Parameters")]
+    [SerializeField] int bulletDamage;
+    [SerializeField] float bulletForce;
+    [SerializeField] float bloom;
+
+    // Properties
+    public float BulletForce
+    {
+        get => bulletForce;
+        set => bulletForce = value;
+    }
 
     protected override bool CanAttack() =>
-        Input.GetMouseButton(0) && timeSinceLastAttack > attackRate && attackPool != null;
+        Input.GetMouseButton(0) && TimeSinceLastAttack > attackRate && AttackPool != null;
 
-    protected override void Attack()
+    public override void Attack()
     {
         base.Attack();
 
         // Initialize the bullet before method call to to avoid closure allocation.
-        GameObject pooledBullet = attackPool.GetPooledObject();
+        GameObject pooledBullet = AttackPool.GetPooledObject();
 
         // If the pooled bullet is null, return.
         try
@@ -40,23 +50,14 @@ public class ShootingSystem : WeaponSystem
 
         // Set the bullet's position and rotation.
         pooledBullet.transform.position = Scythe.HitPoint.transform.position + (mousePos - transform.position).normalized * 0.5f;
-        pooledBullet.transform.rotation = transform.rotation;
+        //pooledBullet.transform.rotation = transform.rotation;
+        //TODO: add random bloom to the bullets. Then continue with the SlashEffect ultrakill thing.
 
         // Add force to the bullet.
         var bulletRB = pooledBullet.GetComponent<Rigidbody2D>();
-        bulletRB.AddForce(transform.up * bulletInfo.bulletForce, ForceMode2D.Impulse);
+        bulletRB.AddForce(transform.up * BulletForce, ForceMode2D.Impulse);
 
         // Return the bullet to the objectPool and reset the attack timer.
         PostAttack(pooledBullet);
     }
-}
-
-[Serializable]
-public struct BulletParameters
-{
-    [Tooltip("The amount of damage the bullet does.")]
-    public int bulletDamage;
-
-    [Tooltip("The force applied to the bullet when it is fired. Alternatively known as the bullet's speed.")]
-    public float bulletForce;
 }

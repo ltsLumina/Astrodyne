@@ -5687,12 +5687,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
-  attackRate: 0.1
+  attackRate: 0.5
   attackLifetime: 5
   timeSinceLastAttack: 0
-  bulletInfo:
-    bulletDamage: 1
-    bulletForce: 10
+  bulletDamage: 1
+  bulletForce: 10
+  bloom: 0
 --- !u!114 &550530368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5709,12 +5709,11 @@ MonoBehaviour:
   attackRate: 0.45
   attackLifetime: 0.45
   timeSinceLastAttack: 0
-  slashInfo:
-    slashDamage: 1
-    knockbackForce: 15
-    slashAnimSpeed: 1
-    slashSize: 1
-    stepForce: 0
+  slashDamage: 1
+  knockbackForce: 15
+  slashAnimSpeed: 1
+  slashSize: 1
+  stepForce: 0
 --- !u!1 &554949525
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,23 +4,49 @@ using UnityEngine;
 using static GameManager;
 #endregion
 
+/// <summary>
+/// //TODO: I want to move all of the slash logic to another class, or a struct perhaps.
+/// //TODO: I.e, I want this class to only handle the weapon and attacking logic, not the slash parameters or settings.
+/// //TODO: Only issue with using structs is that I necessarily use the serialized value, because the value can't be changed in runtime.
+/// </summary>
 public class MeleeSystem : WeaponSystem
 {
-    [Header("Slashing Parameters"), SerializeField, Space(10)]
-    SlashParameters slashInfo;
+    [Header("Slashing Parameters"), Space(10)]
+    [SerializeField] int slashDamage;
+    [SerializeField] float knockbackForce;
+    [SerializeField] float slashAnimSpeed;
+    [SerializeField] float slashSize;
+
+    [Header("Knockback"), Tooltip("The distance the player dashes when attacking.")]
+    public float stepForce;
+
+    public int SlashDamage
+    {
+        get => slashDamage;
+        set => slashDamage = value;
+    }
+    public float KnockbackForce
+    {
+        get => knockbackForce;
+        set => knockbackForce = value;
+    }
 
     // Cached Hashes
     readonly static int AttackID = Animator.StringToHash("attack");
 
-    protected override bool CanAttack() =>
-        Input.GetMouseButton(1) && timeSinceLastAttack > attackRate && attackPool != null;
+    // Properties
+    // The currently active slash effect. Used to flip the slash effect depending on the direction of the mouse.
+    public GameObject ActiveSlash { get; private set; }
 
-    protected override void Attack()
+    protected override bool CanAttack() =>
+        Input.GetMouseButton(1) && TimeSinceLastAttack > attackRate && AttackPool != null;
+
+    public override void Attack()
     {
         base.Attack();
 
         // Initialize the bullet before method call to to avoid closure allocation.
-        GameObject pooledSlash = attackPool.GetPooledObject();
+        GameObject pooledSlash = AttackPool.GetPooledObject();
 
         // If the pooled bullet is null, return.
         try
@@ -33,14 +59,15 @@ public class MeleeSystem : WeaponSystem
         }
 
         // Activate the slash, and set its position and rotation.
-        pooledSlash = attackPool.GetPooledObject(true);
+        pooledSlash = AttackPool.GetPooledObject(true);
+        ActiveSlash = pooledSlash;
 
         pooledSlash.transform.position = Scythe.HitPoint.position;
         pooledSlash.transform.rotation = transform.rotation; //TODO: This is probably wrong.
 
         pooledSlash.GetComponent<Animator>().SetTrigger(AttackID);
-        pooledSlash.GetComponent<Animator>().speed = slashInfo.slashAnimSpeed;
-        pooledSlash.transform.localScale = new Vector2(slashInfo.slashSize, slashInfo.slashSize);
+        pooledSlash.GetComponent<Animator>().speed = slashAnimSpeed;
+        pooledSlash.transform.localScale = new Vector2(slashSize, slashSize);
 
         // //Rotate the slash effect depending on the direction of the mouse.
         float angle = Mathf.Atan2(MousePlayerOffset.y, MousePlayerOffset.x) * Mathf.Rad2Deg;
@@ -52,37 +79,6 @@ public class MeleeSystem : WeaponSystem
         PostAttack(pooledSlash);
 
         // Dash a short distance towards the mouse to make the attack feel more impactful.
-        KnockbackRoutine(gameObject.transform.parent.gameObject, MousePlayerOffset, slashInfo.stepForce);
+        KnockbackRoutine(gameObject.transform.parent.gameObject, MousePlayerOffset, stepForce);
     }
-}
-
-[Serializable]
-public struct SlashParameters
-{ // A struct with data for the slash effect.
-
-    public int SlashDamage
-    {
-        readonly get => slashDamage;
-        set => slashDamage = value;
-    }
-    public float KnockbackForce
-    {
-        readonly get => knockbackForce;
-        set => knockbackForce = value;
-    }
-
-    [Tooltip("The damage the attack does.")]
-    public int slashDamage;
-
-    [Tooltip("The force of the recoil when attacking.")]
-    public float knockbackForce;
-
-    [Tooltip("The speed of the slash effect animation. Scales with the attack delay.")]
-    public float slashAnimSpeed;
-
-    [Tooltip("The size of the slash effect.")]
-    public float slashSize;
-
-    [Header("Knockback"), Tooltip("The distance the player dashes when attacking.")]
-    public float stepForce;
 }
