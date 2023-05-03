@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static SceneManagerExtended;
@@ -34,6 +35,20 @@ public class GameManager : SingletonPersistent<GameManager>
     {
         var rigidbody = gameObject.GetComponent<Rigidbody2D>();
         if (rigidbody != null)
-            rigidbody.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+            rigidbody.AddForce(direction.normalized * (force * 10), ForceMode2D.Impulse);
     }
+
+    #region SLEEP METHOD
+    public void Sleep(float duration) =>
+
+        //Method used so we don't need to call StartCoroutine everywhere
+        StartCoroutine(nameof(PerformSleep), duration);
+
+    IEnumerator PerformSleep(float duration)
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(duration); //Must be Realtime since timeScale with be 0
+        Time.timeScale = 1;
+    }
+    #endregion
 }

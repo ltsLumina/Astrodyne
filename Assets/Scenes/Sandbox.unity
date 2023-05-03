@@ -5402,7 +5402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b80b9857ddfa384cb55dbf810746139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashCount: 99
+  dashCount: 3
   dashSpeed: 20
   dashEndSpeed: {x: 25, y: 25}
   dashMaxAmount: 3
@@ -5414,6 +5414,7 @@ MonoBehaviour:
   dashBufferTime: 0.5
   lastPressedDashTime: 0
   isDashing: 0
+  isDashAttacking: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5686,13 +5687,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da84e085a0c94693ba829d80d460c908, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
-  attackRate: 0.5
-  attackLifetime: 5
+  weaponData: {fileID: 11400000, guid: 265590e3f9417d846868ced420481696, type: 2}
   timeSinceLastAttack: 0
-  bulletDamage: 1
-  bulletForce: 25
-  bloom: 1
 --- !u!114 &550530368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5705,15 +5701,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92ca88f083ca42b8a11578be7deaa867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 3473483447855594552, guid: cd8bfdbe9f03b464391077b0f6a13571, type: 3}
-  attackRate: 0.45
-  attackLifetime: 0.45
+  weaponData: {fileID: 11400000, guid: 089bf59cadbb2774984a7134d21b167a, type: 2}
   timeSinceLastAttack: 0
-  slashDamage: 1
-  knockbackForce: 15
-  slashAnimSpeed: 1
-  slashSize: 1
-  stepForce: 0
+  slashParameters: {fileID: 11400000, guid: b6850f47cbca28e46a9c6e593196cad3, type: 2}
 --- !u!1 &554949525
 GameObject:
   m_ObjectHideFlags: 0

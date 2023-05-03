@@ -1,57 +1,67 @@
-using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using static GameManager;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// TODO: RE-FORMAT THIS SCRIPT TO ALLOW FOR SERIALIZED FIELDS SOMEWHERE. I.e, I WANT TO BE ABLE TO ADJUST THE BOOSTED PROJECTILE SPEED IN THE UNITY EDITOR.
+/// The script that controls the slash effect.
 /// </summary>
 public class SlashEffect : MonoBehaviour
 {
-    MeleeSystem meleeSys;
+    [Header("Slash Parameter"), SerializeField]
+    SlashParameters slashParameters;
     ShootingSystem shootingSys;
-    WeaponSystem weaponSys;
+    WeaponDefinition weaponData;
+    bool isDashingAttacking;
 
     void OnEnable()
     { // Get the slash struct from the player.
-        meleeSys    = FindObjectOfType<MeleeSystem>();
-        shootingSys = meleeSys.GetComponent<ShootingSystem>();
+        shootingSys        = FindObjectOfType<ShootingSystem>();
+        weaponData         = FindObjectOfType<MeleeSystem>().WeaponData;
+        isDashingAttacking = FindObjectOfType<Dash>().IsDashAttacking;
     }
 
     // Controlled through an animation event in the slash animation. (Assets\Animations\Player\Slash\Slash.anim)
     public void OnSlashHit()
     {
         var collider = GetComponent<PolygonCollider2D>();
-        if (collider != null)
+        if (collider == null) return;
+
+        var bounds = collider.bounds;
+
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(bounds.center, bounds.size, 0f);
+        foreach (Collider2D other in colliders)
         {
-            var bounds = collider.bounds;
+            if (other.CompareTag("Enemy")) PerformSlash(other);
 
-            Collider2D[] colliders = Physics2D.OverlapBoxAll(bounds.center, bounds.size, 0f);
-            foreach (Collider2D other in colliders)
-            {
-                if (other.CompareTag("Enemy")) PerformSlash(other);
-
-                if (other.CompareTag("Bullet")) BoostProjectile(other);
-            }
+            // Deprecated for the time being; will be re-implemented in a future update.
+            //if (other.CompareTag("Bullet")) BoostProjectile(other);
         }
     }
 
     void PerformSlash(Component other)
     {
-        Debug.Log("HIT ENEMY   |   " + meleeSys.SlashDamage); //TODO: this is a debug value
+        Debug.Log("HIT ENEMY   |   " + weaponData.damage);
         var enemyComponent = other.gameObject.TryGetComponent<Enemy>(out var enemy) ? enemy : null;
 
         if (enemyComponent != null)
         { // Deal damage to the enemy.
-            enemy.TakeDamage(meleeSys.SlashDamage);
+            enemy.TakeDamage(weaponData.damage);
 
             // Generate a random offset for the knockback, then apply it to the enemy.
             var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
-            KnockbackRoutine(enemy.gameObject, enemy.transform.position - transform.position + randomizedOffset, meleeSys.KnockbackForce);
+            Vector3 knockbackDir = enemy.transform.position - transform.position + randomizedOffset;
+
+            //TODO: THIS WILL BE REWORKED IN THE FUTURE.
+            // Knockback the enemy away from the player.
+            KnockbackRoutine(enemy.gameObject,
+                             knockbackDir,
+                             isDashingAttacking ? slashParameters.dashAttackKnockbackForce : slashParameters.knockbackForce);
         }
         else { Debug.LogError("No 'Enemy' script found!"); }
     }
 
+    [Obsolete] //TODO: Implement this in a future update.
     void BoostProjectile(Component other)
     {
         var bulletComponent = other.gameObject;
@@ -63,7 +73,7 @@ public class SlashEffect : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             shootingSys.ActiveBullet.GetComponent<TrailRenderer>().startColor = Color.red;
-            shootingSys.ActiveBullet.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            shootingSys.ActiveBullet.transform.localScale = new (1.5f, 1.5f, 1.5f);
             shootingSys.Attack();
         }
 

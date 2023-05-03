@@ -1,35 +1,17 @@
 ﻿#region
 using System;
+using Essentials;
 using UnityEngine;
 using static GameManager;
 #endregion
 
 /// <summary>
-/// //TODO: I want to move all of the slash logic to another class, or a struct perhaps.
-/// //TODO: I.e, I want this class to only handle the weapon and attacking logic, not the slash parameters or settings.
-/// //TODO: Only issue with using structs is that I necessarily use the serialized value, because the value can't be changed in runtime.
+/// The system that handles all melee combat. Currently only supports the slash.
 /// </summary>
 public class MeleeSystem : WeaponSystem
 {
-    [Header("Slashing Parameters"), Space(10)]
-    [SerializeField] int slashDamage;
-    [SerializeField] float knockbackForce;
-    [SerializeField] float slashAnimSpeed;
-    [SerializeField] float slashSize;
-
-    [Header("Knockback"), Tooltip("The distance the player dashes when attacking.")]
-    public float stepForce;
-
-    public int SlashDamage
-    {
-        get => slashDamage;
-        set => slashDamage = value;
-    }
-    public float KnockbackForce
-    {
-        get => knockbackForce;
-        set => knockbackForce = value;
-    }
+    [Header("Slashing Parameters"), SerializeField]
+    SlashParameters slashParameters;
 
     // Cached Hashes
     readonly static int AttackID = Animator.StringToHash("attack");
@@ -39,11 +21,14 @@ public class MeleeSystem : WeaponSystem
     public GameObject ActiveSlash { get; private set; }
 
     protected override bool CanAttack() =>
-        (Input.GetMouseButton(1) || Input.GetKeyDown(KeyCode.V)) && TimeSinceLastAttack > attackRate && AttackPool != null;
+        (Input.GetMouseButton(1) || Input.GetKey(KeyCode.V)) && TimeSinceLastAttack > WeaponData.attackDelay && AttackPool != null;
 
     public override void Attack()
     {
         base.Attack();
+
+        // Dash a short distance towards the mouse to make the attack feel more impactful.
+        KnockbackRoutine(gameObject.transform.parent.gameObject, MousePlayerOffset, WeaponData.stepDistance);
 
         // Initialize the bullet before method call to to avoid closure allocation.
         GameObject pooledSlash = AttackPool.GetPooledObject();
@@ -63,10 +48,14 @@ public class MeleeSystem : WeaponSystem
         ActiveSlash = pooledSlash;
 
         pooledSlash.transform.position = Scythe.HitPoint.position;
-        pooledSlash.transform.rotation = transform.rotation; //TODO: This is probably wrong.
+        pooledSlash.transform.rotation = transform.rotation;
 
-        pooledSlash.GetComponent<Animator>().SetTrigger(AttackID);
-        pooledSlash.GetComponent<Animator>().speed = slashAnimSpeed;
+        var pooledSlashAnim = pooledSlash.GetComponent<Animator>();
+
+        pooledSlashAnim.SetTrigger(AttackID);
+        pooledSlashAnim.speed = WeaponData.animationSpeedScalar;
+
+        float slashSize = dash.IsDashAttacking ? slashParameters.dashAttackSlashSize : slashParameters.slashSize;
         pooledSlash.transform.localScale = new Vector2(slashSize, slashSize);
 
         //Rotate the slash effect depending on the direction of the mouse.
@@ -77,8 +66,5 @@ public class MeleeSystem : WeaponSystem
         pooledSlash.transform.parent = FindObjectOfType<Player>().transform;
 
         PostAttack(pooledSlash);
-
-        // Dash a short distance towards the mouse to make the attack feel more impactful.
-        KnockbackRoutine(gameObject.transform.parent.gameObject, MousePlayerOffset, stepForce);
     }
 }

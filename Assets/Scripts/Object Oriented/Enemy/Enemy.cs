@@ -4,15 +4,21 @@ using static GameManager;
 /// <summary>
 /// TODO: REWORK THE ENEMY SCRIPT
 /// </summary>
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IDamageable
 {
-    [SerializeField] int health = 100;
+    [SerializeField] int health;
+
+    public int Health
+    {
+        get => health;
+        set => health = value;
+    }
 
     void Update()
     {
         // move towards player
         Vector2 playerPos = FindObjectOfType<Player>().transform.position;
-        //transform.position = Vector2.MoveTowards(transform.position, playerPos, 1f * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, playerPos, 1f * Time.deltaTime);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -22,15 +28,25 @@ public class Enemy : MonoBehaviour
             case "Player":
                 Debug.Log("HIT PLAYER");
                 var player = other.gameObject;
+
+                // Take damage.
                 player.GetComponent<Player>().CurrentHealth--;
-                KnockbackRoutine(player, player.transform.position - transform.position, 25);
+
+                // Knockback the player.
+                KnockbackRoutine(player, player.transform.position - transform.position, 1);
                 break;
 
             case "Bullet":
                 Debug.Log("HIT BY BULLET");
                 var bullet = other.gameObject;
-                health--;
+
+                // Take damage.
+                TakeDamage(1);
+
+                // Return the bullet to the pool.
                 bullet.SetActive(false);
+
+                // Knockback the enemy.
                 KnockbackRoutine(gameObject, transform.position - bullet.transform.position, 7.5f);
                 break;
         }
@@ -38,9 +54,14 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        if (TryGetComponent(out IDamageable hit))
+        {
+            hit.Damage(damage);
+            Debug.Log("Hit enemy for " + damage + " damage!");
+        }
+
         StartCoroutine(PlayerAnimationManager.SpriteRoutine(0.5f, GetComponent<SpriteRenderer>()));
 
-        if (health <= 0) Destroy(gameObject);
+        if (Health <= 0) Destroy(gameObject);
     }
 }

@@ -6,19 +6,22 @@ using UnityEngine;
 using static UnityEngine.KeyCode;
 #endregion
 
-public abstract class InputManager : MonoBehaviour
+public abstract class DashInputManager : MonoBehaviour
 {
     readonly List<KeyCode> doubleTapKeys = new ()
     {
         // W, A, S and D keys.
         W, A, S, D
-        // UpArrow, LeftArrow, DownArrow and RightArrow keys.
+        // Arrow keys.
         , UpArrow, LeftArrow, DownArrow, RightArrow
     };
     readonly Dictionary<KeyCode, float> doubleTapTimers = new ();
 
     //TODO: put this at the bottom of the serializedfields. // nevermind, need to make custom editor script and that's not worth it.
     const float DOUBLE_TAP_TIME_THRESHOLD = 0.25f;
+    
+    protected static Vector2 InputDirection() =>
+        new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
 
     protected bool CheckDoubleTap()
     {
@@ -38,20 +41,4 @@ public abstract class InputManager : MonoBehaviour
         return false;
     }
 
-    protected static Vector2 InputDirection() =>
-        new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
-
-    #region SLEEP METHOD
-    protected void Sleep(float duration) =>
-
-        //Method used so we don't need to call StartCoroutine everywhere
-        StartCoroutine(nameof(PerformSleep), duration);
-
-    IEnumerator PerformSleep(float duration)
-    {
-        Time.timeScale = 0;
-        yield return new WaitForSecondsRealtime(duration); //Must be Realtime since timeScale with be 0
-        Time.timeScale = 1;
-    }
-    #endregion
 }

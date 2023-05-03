@@ -5,12 +5,8 @@ using Essentials;
 using static UnityEngine.Debug;
 #endregion
 
-public class Dash : InputManager
+public class Dash : DashInputManager
 {
-    [Header("Cached References")]
-    Player player;
-    Camera cam;
-
     [Header("Dash"), Space(5), SerializeField]
     int dashCount;
     [SerializeField] float dashSpeed;
@@ -23,12 +19,21 @@ public class Dash : InputManager
     [SerializeField] float dashEndTime;
     [SerializeField] float dashAttackTime;
     [SerializeField] float dashSleepTime;
-    [Space(5), SerializeField, Range(0.01f, 2f), Tooltip("The amount of time the player has to wait before dashing again. A higher value means the player can dash less often.")]
+    [Space(5), SerializeField, Range(0.01f, 2f),
+     Tooltip("The amount of time the player has to wait before dashing again. " +
+             "A higher value means the player can dash less often.")]
     float dashBufferTime;
 
     [Header("Read-only Fields")]
     [SerializeField, ReadOnly] float lastPressedDashTime;
     [SerializeField, ReadOnly] bool isDashing;
+    [SerializeField, ReadOnly] bool isDashAttacking;
+
+    [Header("Cached References")]
+    Player player;
+    Camera cam;
+    Collider2D playerCollider;
+    WeaponDefinition weaponData;
 
     // Delegates
     public delegate void OnDash();
@@ -40,6 +45,12 @@ public class Dash : InputManager
         private set => isDashing = value;
     }
 
+    public bool IsDashAttacking
+    {
+        get => isDashAttacking;
+        set => isDashAttacking = value;
+    }
+
     public float LastPressedDashTime
     {
         get => lastPressedDashTime;
@@ -48,8 +59,10 @@ public class Dash : InputManager
 
     void Awake()
     {
-        player = GetComponent<Player>();
-        cam    = Camera.main;
+        player         = GetComponent<Player>();
+        cam            = Camera.main;
+        playerCollider = GetComponent<Collider2D>();
+        weaponData     = GetComponentInChildren<WeaponSystem>().WeaponData;
     }
 
     void Update()
@@ -80,7 +93,7 @@ public class Dash : InputManager
         {
             IsDashing = true;
             //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
-            Sleep(dashSleepTime);
+            GameManager.Instance.Sleep(dashSleepTime);
 
             // Run the dash coroutine.
             onDash?.Invoke();
@@ -92,6 +105,7 @@ public class Dash : InputManager
     IEnumerator StartDash(Vector2 dashDirection)
     {
         Log("Dashing!");
+
         Vector2 originalVelocity = player.RB.velocity;
 
         LastPressedDashTime = dashBufferTime;
@@ -100,7 +114,10 @@ public class Dash : InputManager
 
         dashCount--;
 
-        //isDashAttacking = false;
+        IsDashAttacking = true;
+
+        // Disable the player's collider so they don't collide with anything while dashing.
+        playerCollider.enabled = false;
 
         //We keep the player's velocity at the dash speed during the "attack" phase (in celeste the first 0.15s)
         while (Time.time - startTime <= dashAttackTime)
@@ -114,7 +131,7 @@ public class Dash : InputManager
 
         startTime = Time.time;
 
-        //isDashAttacking = false;
+        IsDashAttacking = false;
 
         //Begins the "end" of our dash where we return some control to the player but still limit run acceleration (see Update() and Run())
         while (Time.time - startTime <= dashEndTime)
@@ -146,8 +163,13 @@ public class Dash : InputManager
 
         player.RB.velocity = originalVelocity;
 
+        // Disable the player's collider so they don't collide with anything while dashing.
+        playerCollider.enabled = true;
+
         //Dash finished.
-        IsDashing = false;
+        IsDashing =  false;
+
+        weaponData.size = 1;
 
     }
 

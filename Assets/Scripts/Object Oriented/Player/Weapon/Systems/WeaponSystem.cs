@@ -11,15 +11,15 @@ using UnityEngine;
 public abstract class WeaponSystem : MonoBehaviour
 {
     [Header("Common Parameters"), SerializeField, Tooltip("The prefab to be used in instantiating the attack. I.e the bullet, slash, etc.")]
-    protected GameObject weaponPrefab;
+    WeaponDefinition weaponData;
 
     [Space(5)]
 
-    [SerializeField, Tooltip("How long the player must wait before attacking again.")] //TODO: set attack rate value to bullets per minute
-    protected float attackRate;
+    //[SerializeField, Tooltip("How long the player must wait before attacking again.")] //TODO: set attack rate value to bullets per minute
+    //protected float attackRate;
 
-    [SerializeField, Tooltip("How long the attack will last before being returned to the pool.")]
-    protected float attackLifetime;
+    //[SerializeField, Tooltip("How long the attack will last before being returned to the pool.")]
+    //protected float attackLifetime;
 
     [Space(5)]
 
@@ -28,6 +28,8 @@ public abstract class WeaponSystem : MonoBehaviour
 
     // Cached references.
     protected Camera cam;
+    protected Dash dash;
+
     public ObjectPool AttackPool { get; set; }
 
     // Returns the direction of the mouse relative to the player.
@@ -39,24 +41,31 @@ public abstract class WeaponSystem : MonoBehaviour
         private set => timeSinceLastAttack = value;
     }
 
-    // Delegate for when the player attacks.
+    public WeaponDefinition WeaponData
+    {
+        get => weaponData;
+        set => weaponData = value;
+    }
+
+    // Delegate for when the player attacks. //TODO: Convert to unity event possibly?
     public delegate void OnAttack();
     public event OnAttack onAttack;
 
     protected virtual void Start()
     {
         // Cache references.
-        cam = Camera.main;
+        cam  = Camera.main;
+        dash = GetComponentInParent<Dash>();
 
         // Initialize the object pool.
-        AttackPool = ObjectPoolManager.CreateNewPool(weaponPrefab, 10);
-        AttackPool.gameObject.name = $"{weaponPrefab.name} Pool";
+        AttackPool = ObjectPoolManager.CreateNewPool(WeaponData.weaponPrefab, 10);
+        AttackPool.gameObject.name = $"{WeaponData.weaponPrefab.name} Pool";
 
         // Subscribe to the onAttack event.
         onAttack += Attack;
 
         // Asserting that the attackLifetime is greater than 0 to prevent the attack from never being returned to the pool.
-        Debug.Assert(attackLifetime >= 0, "Attack lifetime is less than or equal to 0. " +
+        Debug.Assert(WeaponData.lifetime >= 0, "Attack lifetime is less than or equal to 0. " +
                                          "This will cause the attack to never be returned to the pool.");
     }
 
@@ -84,8 +93,8 @@ public abstract class WeaponSystem : MonoBehaviour
     protected virtual void PostAttack(GameObject pooledAttack)
     {
         // Return the attack to the pool after attackLifetime seconds.
-        Task delayTask = UsefulMethods.DelayedTaskAsync(() => pooledAttack.SetActive(false), attackLifetime).AsTask();
-        delayTask.ContinueWith(_ => Debug.Log($"{weaponPrefab.name} returned to pool!"));
+        Task delayTask = UsefulMethods.DelayedTaskAsync(() => pooledAttack.SetActive(false), WeaponData.lifetime).AsTask();
+        delayTask.ContinueWith(_ => Debug.Log($"{WeaponData.weaponPrefab.name} returned to pool!"));
 
         // Reset the attack timer.
         TimeSinceLastAttack = 0;

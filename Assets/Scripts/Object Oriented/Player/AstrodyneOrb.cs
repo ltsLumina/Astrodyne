@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Astrodyne : MonoBehaviour
+public class AstrodyneOrb : MonoBehaviour
 {
     #region Serialized Fields
     [Header("Cached References")]
