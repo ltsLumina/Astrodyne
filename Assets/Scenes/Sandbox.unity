@@ -5624,8 +5624,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: a3dacaec0287d7444b4bd276816e1666, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 1
-  m_FrequencyGain: 0.5
+  m_AmplitudeGain: 2
+  m_FrequencyGain: 0.35
   mNoiseOffsets: {x: 134.39713, y: 714.9625, z: -532.6133}
 --- !u!1 &550530359
 GameObject:

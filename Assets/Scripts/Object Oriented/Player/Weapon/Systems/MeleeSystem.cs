@@ -19,6 +19,11 @@ public class MeleeSystem : WeaponSystem
     // Properties
     // The currently active slash effect. Used to flip the slash effect depending on the direction of the mouse.
     public GameObject ActiveSlash { get; private set; }
+    public SlashParameters SlashData
+    {
+        get => slashParameters;
+        set => slashParameters = value;
+    }
 
     protected override bool CanAttack() =>
         (Input.GetMouseButton(1) || Input.GetKey(KeyCode.V)) && TimeSinceLastAttack > WeaponData.attackDelay && AttackPool != null;
@@ -55,7 +60,7 @@ public class MeleeSystem : WeaponSystem
         pooledSlashAnim.SetTrigger(AttackID);
         pooledSlashAnim.speed = WeaponData.animationSpeedScalar;
 
-        float slashSize = dash.IsDashAttacking ? slashParameters.dashAttackSlashSize : slashParameters.slashSize;
+        float slashSize = dash.IsDashAttacking ? SlashData.dashAttackSlashSize : SlashData.slashSize;
         pooledSlash.transform.localScale = new Vector2(slashSize, slashSize);
 
         //Rotate the slash effect depending on the direction of the mouse.

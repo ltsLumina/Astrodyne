@@ -32,8 +32,10 @@ public class Enemy : MonoBehaviour, IDamageable
                 // Take damage.
                 player.GetComponent<Player>().CurrentHealth--;
 
-                // Knockback the player.
-                KnockbackRoutine(player, player.transform.position - transform.position, 1);
+                // Knockback the player and the enemy slightly
+                var playerPos = player.transform.position;
+                KnockbackRoutine(gameObject, transform.position - playerPos, 10);
+                KnockbackRoutine(player, playerPos - transform.position, 10);
                 break;
 
             case "Bullet":
@@ -47,7 +49,7 @@ public class Enemy : MonoBehaviour, IDamageable
                 bullet.SetActive(false);
 
                 // Knockback the enemy.
-                KnockbackRoutine(gameObject, transform.position - bullet.transform.position, 7.5f);
+                KnockbackRoutine(gameObject, transform.position - bullet.transform.position, 25f);
                 break;
         }
     }
@@ -57,7 +59,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (TryGetComponent(out IDamageable hit))
         {
             hit.Damage(damage);
-            Debug.Log("Hit enemy for " + damage + " damage!");
+            Debug.Log($"Hit enemy for {damage} damage!");
         }
 
         StartCoroutine(PlayerAnimationManager.SpriteRoutine(0.5f, GetComponent<SpriteRenderer>()));

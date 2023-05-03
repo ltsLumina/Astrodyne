@@ -31,11 +31,11 @@ public class GameManager : SingletonPersistent<GameManager>
     ///     Knockback any gameobject with a rigidbody2D.
     /// </summary>
     /// <remarks> Keep in mind that the direction parameter already is normalized. </remarks>
-    public static void KnockbackRoutine(GameObject gameObject, Vector2 direction, float force = 10f)
+    public static void KnockbackRoutine(GameObject gameObject, Vector2 direction, float force = 10)
     {
         var rigidbody = gameObject.GetComponent<Rigidbody2D>();
         if (rigidbody != null)
-            rigidbody.AddForce(direction.normalized * (force * 10), ForceMode2D.Impulse);
+            rigidbody.AddForce(direction.normalized * force, ForceMode2D.Impulse);
     }
 
     #region SLEEP METHOD

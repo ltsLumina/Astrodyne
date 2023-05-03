@@ -8,17 +8,27 @@ using Random = UnityEngine.Random;
 /// </summary>
 public class SlashEffect : MonoBehaviour
 {
-    [Header("Slash Parameter"), SerializeField]
-    SlashParameters slashParameters;
-    ShootingSystem shootingSys;
-    WeaponDefinition weaponData;
+    // Fields
     bool isDashingAttacking;
 
+    // Cached References
+    SlashParameters slashParameters;
+    WeaponDefinition weaponData;
+    MeleeSystem meleeSystem;
+    Dash dash;
+
+
+    void Awake()
+    {
+        meleeSystem = FindObjectOfType<MeleeSystem>();
+        dash        = FindObjectOfType<Dash>();
+    }
+
     void OnEnable()
-    { // Get the slash struct from the player.
-        shootingSys        = FindObjectOfType<ShootingSystem>();
-        weaponData         = FindObjectOfType<MeleeSystem>().WeaponData;
-        isDashingAttacking = FindObjectOfType<Dash>().IsDashAttacking;
+    {
+        slashParameters    = meleeSystem.SlashData;
+        weaponData         = meleeSystem.WeaponData;
+        isDashingAttacking = dash.IsDashAttacking;
     }
 
     // Controlled through an animation event in the slash animation. (Assets\Animations\Player\Slash\Slash.anim)
@@ -41,7 +51,7 @@ public class SlashEffect : MonoBehaviour
 
     void PerformSlash(Component other)
     {
-        Debug.Log("HIT ENEMY   |   " + weaponData.damage);
+        Debug.Log($"Hit {other.gameObject.name} for {weaponData.damage} damage!");
         var enemyComponent = other.gameObject.TryGetComponent<Enemy>(out var enemy) ? enemy : null;
 
         if (enemyComponent != null)
@@ -72,9 +82,9 @@ public class SlashEffect : MonoBehaviour
         // Activate multiple bullets.
         for (int i = 0; i < 3; i++)
         {
-            shootingSys.ActiveBullet.GetComponent<TrailRenderer>().startColor = Color.red;
-            shootingSys.ActiveBullet.transform.localScale = new (1.5f, 1.5f, 1.5f);
-            shootingSys.Attack();
+            //shootingSys.ActiveBullet.GetComponent<TrailRenderer>().startColor = Color.red;
+            //shootingSys.ActiveBullet.transform.localScale = new (1.5f, 1.5f, 1.5f);
+            //shootingSys.Attack();
         }
 
         CameraShake.Instance.ShakeCamera(5f, 0.2f);
