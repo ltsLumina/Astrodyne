@@ -24,7 +24,7 @@ namespace Essentials
         static void DamagePlayer()
         {
             // Damage the player by 10.
-            GameManager.Instance.Player.CurrentHealth -= 10;
+            GameManager.Instance.Player.Health -= 10;
             Debug.Log("Player damaged.");
         }
 
@@ -33,7 +33,7 @@ namespace Essentials
         {
             // Heal the player by 10.
             if (GameManager.Instance.Player.IsDead) return;
-            GameManager.Instance.Player.CurrentHealth += 10;
+            GameManager.Instance.Player.Health += 10;
             Debug.Log("Player healed.");
         }
 
@@ -41,7 +41,7 @@ namespace Essentials
         static void KillPlayer()
         {
             // Kill the player.
-            GameManager.Instance.Player.CurrentHealth = 0;
+            GameManager.Instance.Player.Health = 0;
             Debug.Log("Player killed.");
         }
 

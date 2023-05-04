@@ -49,26 +49,25 @@ public class SlashEffect : MonoBehaviour
         }
     }
 
+    //TODO: currently, dealing damage with the slash is handled in this script, while the enemy taking damage is handled in its own script.
+    // I need to decouple these two things and move the damage dealing to the enemy script or a separate script or interface.
     void PerformSlash(Component other)
     {
         Debug.Log($"Hit {other.gameObject.name} for {weaponData.damage} damage!");
         var enemyComponent = other.gameObject.TryGetComponent<Enemy>(out var enemy) ? enemy : null;
 
-        if (enemyComponent != null)
-        { // Deal damage to the enemy.
-            enemy.TakeDamage(weaponData.damage);
+        if (enemyComponent == null) return; // Deal damage to the enemy.
+        enemy.TakeDamage(weaponData.damage); // <<< This line is the problem. I need to decouple this from the slash effect.
 
-            // Generate a random offset for the knockback, then apply it to the enemy.
-            var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
-            Vector3 knockbackDir = enemy.transform.position - transform.position + randomizedOffset;
+        // Generate a random offset for the knockback, then apply it to the enemy.
+        var randomizedOffset = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f)); //TODO: Readjust this/re-code it.
+        Vector3 knockbackDir = enemy.transform.position - transform.position + randomizedOffset;
 
-            //TODO: THIS WILL BE REWORKED IN THE FUTURE.
-            // Knockback the enemy away from the player.
-            KnockbackRoutine(enemy.gameObject,
-                             knockbackDir,
-                             isDashingAttacking ? slashParameters.dashAttackKnockbackForce : slashParameters.knockbackForce);
-        }
-        else { Debug.LogError("No 'Enemy' script found!"); }
+        //TODO: THIS WILL BE REWORKED IN THE FUTURE.
+        // Knockback the enemy away from the player.
+        float knockbackForce = isDashingAttacking ? slashParameters.dashAttackKnockbackForce : slashParameters.knockbackForce;
+
+        KnockbackRoutine(enemy.gameObject, knockbackDir, knockbackForce);
     }
 
     [Obsolete] //TODO: Implement this in a future update.

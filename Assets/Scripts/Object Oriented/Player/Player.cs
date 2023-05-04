@@ -8,7 +8,7 @@ using static UnityEngine.Debug;
 #endregion
 
 [RequireComponent(typeof(Rigidbody2D)), RequireComponent(typeof(CapsuleCollider2D))]
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     #region Cached References
     [Header("Cached References")]
@@ -22,9 +22,9 @@ public class Player : MonoBehaviour
     [Header("Movement"), Space(5)]
     [SerializeField] float moveSpeed = 5f;
 
-    [Header("Health"), Space(5)]
-    [SerializeField] int maxHealth = 100;
-    [SerializeField] int currentHealth = 100;
+    [Header("Health"), Space(5), SerializeField]
+    int health = 100;
+    const int maxHealth = 100;
     int previousHealth;
 
     [Header("Read-only Fields")]
@@ -49,19 +49,19 @@ public class Player : MonoBehaviour
         set => isFacingRight = value;
     }
 
-    public int CurrentHealth
+    public int Health
     {
-        get => currentHealth;
+        get => health;
         set
         {
-            previousHealth = currentHealth;
-            currentHealth  = value;
-            currentHealth  = Mathf.Clamp(currentHealth, 0, maxHealth);
+            previousHealth = health;
+            health  = value;
+            health  = Mathf.Clamp(health, 0, maxHealth);
 
-            if (currentHealth < previousHealth)
+            if (health < previousHealth)
                 onPlayerTakeDamage?.Invoke();
 
-            IsDead = currentHealth <= 0;
+            IsDead = health <= 0;
             if (IsDead) HandleDeath();
         }
     }
@@ -85,6 +85,12 @@ public class Player : MonoBehaviour
                 onMoveInputChanged?.Invoke(moveInput);
             }
         }
+    }
+
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set => moveSpeed = value;
     }
     #endregion
 
@@ -143,7 +149,7 @@ public class Player : MonoBehaviour
             }
 
             //RB.velocity = new Vector2(moveInput.x, moveInput.y) * moveSpeed;
-            Vector2 force = new Vector2(MoveInput.x, MoveInput.y).normalized * moveSpeed;
+            Vector2 force = new Vector2(MoveInput.x, MoveInput.y).normalized * MoveSpeed;
 
             // adjust RB.drag based on moveInput
             RB.AddForce(force, ForceMode2D.Force);
@@ -156,7 +162,7 @@ public class Player : MonoBehaviour
     IEnumerator OnTakeDamage()
     {
         // If the player is dead, stop the coroutine.
-        if (CurrentHealth == 0) yield break;
+        if (Health == 0) yield break;
 
         // Camera shake to indicate damage has been taken.
         CameraShake.Instance.ShakeCamera(1.5f, 0.2f);

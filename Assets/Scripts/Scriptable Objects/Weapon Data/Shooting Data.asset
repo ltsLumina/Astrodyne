@@ -15,11 +15,11 @@ MonoBehaviour:
   weaponClass: 1
   weaponPrefab: {fileID: 4748728964012474876, guid: a593c64b410c5aa48a81cb38d306cbf6, type: 3}
   damage: 1
-  attackDelay: 0.2
+  attackDelay: 0.4
   lifetime: 2
   knockbackForce: 4
   animationSpeedScalar: 1
   size: 1
   stepDistance: 0
-  bulletSpeed: 10
+  bulletSpeed: 25
   bulletSize: 1

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Weapon Data", menuName = "Create Weapon", order = 0)]
+[CreateAssetMenu(fileName = "Weapon Data", menuName = "Weapons/Create Weapon", order = 0)]
 public class WeaponDefinition : ScriptableObject
 {
     public enum WeaponClass { Melee, Ranged, }

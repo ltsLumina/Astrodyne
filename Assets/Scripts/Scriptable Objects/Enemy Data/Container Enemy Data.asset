@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1775008054625008699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 289eec9a76d54bf8967b8d755977b47c, type: 3}
+  m_Name: Slug Data Variation (Angry)
+  m_EditorClassIdentifier: 
+  _myContainer: {fileID: 11400000}
+  _name: Slug Data Variation (Angry)
+  _damage: 10
+  _moveSpeed: 2
+  _health: 100
+  _attackDelay: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31c2785e736b445bb8ddf68b84fae719, type: 3}
+  m_Name: Container Enemy Data
+  m_EditorClassIdentifier: 
+  _damageTypes:
+  - {fileID: 542233697393614532}
+  - {fileID: -1775008054625008699}
+--- !u!114 &542233697393614532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 289eec9a76d54bf8967b8d755977b47c, type: 3}
+  m_Name: Slug Data
+  m_EditorClassIdentifier: 
+  _myContainer: {fileID: 11400000}
+  _name: Slug Data
+  _damage: 1
+  _moveSpeed: 1
+  _health: 100
+  _attackDelay: 1

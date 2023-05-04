@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using static Essentials.UsefulMethods;
 using static SceneManagerExtended;
 using ReadOnly = Essentials.ReadOnlyAttribute;
 
@@ -24,7 +25,7 @@ public class GameManager : SingletonPersistent<GameManager>
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Backspace))
-            Essentials.UsefulMethods.DelayedTaskAsync(ReloadScene, 1.5f).AsTask();
+            DelayedTaskAsync(ReloadScene, 1.5f).AsTask();
     }
 
     /// <summary>
