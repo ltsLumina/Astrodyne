@@ -269,7 +269,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &351146942
 Transform:
   m_ObjectHideFlags: 0
@@ -5328,6 +5328,7 @@ MonoBehaviour:
   moveInput: {x: 0, y: 0}
   lastMoveInput: {x: 0, y: 0}
   isDead: 0
+  isFacingRight: 1
 --- !u!70 &431302120
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

@@ -45,15 +45,15 @@ public class PlayerAnimationManager : MonoBehaviour
         // Flips the sprite if the mouse is to the left of the player.
         if (mousePos.x > transform.position.x)
         {
-            sprite.flipX  = true;
-            player.IsFacingRight = false;
-            Debug.Assert(!player.IsFacingRight, "Facing Left!");
+            sprite.flipX         = true;
+            player.IsFacingRight = true;
+            Debug.Assert(player.IsFacingRight, "Facing Right!");
         }
         else
         {
-            sprite.flipX  = false;
-            player.IsFacingRight = true;
-            Debug.Assert(player.IsFacingRight, "Facing Right!");
+            sprite.flipX         = false;
+            player.IsFacingRight = false;
+            Debug.Assert(!player.IsFacingRight, "Facing Left!");
         }
     }
 

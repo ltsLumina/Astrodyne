@@ -31,6 +31,7 @@ public class Player : MonoBehaviour
     [SerializeField, ReadOnly] Vector2 moveInput;
     [SerializeField, ReadOnly] Vector2 lastMoveInput;
     [SerializeField, ReadOnly] bool isDead;
+    [SerializeField, ReadOnly] bool isFacingRight;
     #endregion
 
     public delegate void OnMoveInputChanged(Vector2 moveInput);
@@ -41,7 +42,13 @@ public class Player : MonoBehaviour
 
     #region Properties
     public Rigidbody2D RB { get; private set; }
-    public bool IsFacingRight { get; set; } = true;
+
+    public bool IsFacingRight
+    {
+        get => isFacingRight;
+        set => isFacingRight = value;
+    }
+
     public int CurrentHealth
     {
         get => currentHealth;
