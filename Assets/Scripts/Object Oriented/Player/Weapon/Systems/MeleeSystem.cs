@@ -11,7 +11,7 @@ using static GameManager;
 public class MeleeSystem : WeaponSystem
 {
     [Header("Slashing Parameters"), SerializeField]
-    SlashParameters slashParameters;
+    SlashParameters slashData;
 
     // Cached Hashes for the animator.
     readonly static int DoAttack = Animator.StringToHash("doAttack");
@@ -21,8 +21,8 @@ public class MeleeSystem : WeaponSystem
     public GameObject ActiveSlash { get; private set; }
     public SlashParameters SlashData
     {
-        get => slashParameters;
-        set => slashParameters = value;
+        get => slashData;
+        set => slashData = value;
     }
 
     protected override bool CanAttack() =>

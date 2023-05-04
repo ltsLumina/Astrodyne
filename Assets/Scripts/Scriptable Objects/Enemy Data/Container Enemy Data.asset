@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 289eec9a76d54bf8967b8d755977b47c, type: 3}
-  m_Name: Slug Data Variation (Angry)
+  m_Name: Slug Data (Angry)
   m_EditorClassIdentifier: 
   _myContainer: {fileID: 11400000}
-  _name: Slug Data Variation (Angry)
+  _name: Slug Data (Angry)
   _damage: 10
   _moveSpeed: 2
   _health: 100

@@ -68,8 +68,8 @@ public abstract class Enemy : MonoBehaviour, IDamageable
                 var playerPos = player.transform.position;
 
                 // Knockback the player and the enemy slightly
-                KnockbackRoutine(gameObject, transform.position - playerPos, 10);
-                KnockbackRoutine(player, playerPos - transform.position, 10);
+                KnockbackRoutine(gameObject, transform.position - playerPos, 50);
+                KnockbackRoutine(player, playerPos - transform.position, 25);
                 break;
 
             case "Bullet":
