@@ -8,7 +8,7 @@ using ReadOnly = Essentials.ReadOnlyAttribute;
 public class GameManager : SingletonPersistent<GameManager>
 {
     // Singleton reference to the player.
-    public Player Player { get; private set; }
+    public Player Player { get; private set; } //TODO: remove this, it's bad. Only used in essentials though.
 
     [Header("Score"), ReadOnly, SerializeField]
     int score;

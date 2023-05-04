@@ -19,7 +19,7 @@ namespace Cysharp.Threading.Tasks
         Realtime
     }
 
-    public partial struct UniTask
+    public readonly partial struct UniTask
     {
         public static YieldAwaitable Yield()
         {
@@ -121,21 +121,14 @@ namespace Cysharp.Threading.Tasks
             return new UniTask(DelayFramePromise.Create(delayFrameCount, delayTiming, cancellationToken, out var token), token);
         }
 
-        public static UniTask Delay(int millisecondsDelay, bool ignoreTimeScale = false, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            var delayTimeSpan = TimeSpan.FromMilliseconds(millisecondsDelay);
-            return Delay(delayTimeSpan, ignoreTimeScale, delayTiming, cancellationToken);
-        }
-
-        public static UniTask Delay(TimeSpan delayTimeSpan, bool ignoreTimeScale = false, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
+        public static UniTask Delay
+        (
+            TimeSpan delayTimeSpan, CancellationToken timeScale, bool ignoreTimeScale = false,
+            PlayerLoopTiming delayTiming = PlayerLoopTiming.Update,
+            CancellationToken cancellationToken = default(CancellationToken)
+        )
         {
             var delayType = ignoreTimeScale ? DelayType.UnscaledDeltaTime : DelayType.DeltaTime;
-            return Delay(delayTimeSpan, delayType, delayTiming, cancellationToken);
-        }
-
-        public static UniTask Delay(int millisecondsDelay, DelayType delayType, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            var delayTimeSpan = TimeSpan.FromMilliseconds(millisecondsDelay);
             return Delay(delayTimeSpan, delayType, delayTiming, cancellationToken);
         }
 

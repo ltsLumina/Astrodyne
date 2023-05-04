@@ -54,7 +54,11 @@ public class Dash : DashInputManager
     public float LastPressedDashTime
     {
         get => lastPressedDashTime;
-        set => lastPressedDashTime = value;
+        set
+        {
+            lastPressedDashTime = value;
+            lastPressedDashTime = Mathf.Clamp(lastPressedDashTime, 0, lastPressedDashTime);
+        }
     }
 
     void Awake()

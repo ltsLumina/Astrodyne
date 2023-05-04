@@ -72,8 +72,8 @@ namespace Essentials
         /// <summary>
         ///     Allows you to call a method after a delay through the use of an asynchronous operation.
         /// </summary>
-        /// <example> DelayedTaskAsync(() => action(), delayInSeconds, debugLog, cancellationToken).AsTask(); </example>
         /// <remarks> To run a method after the task is completed: Task delayTask = delayTask.ContinueWith(_ => action();</remarks>
+        /// <example> DelayedTaskAsync(() => action(), delayInSeconds, debugLog, cancellationToken).AsTask(); </example>
         /// <param name="action">The action or method to run. Use delegate lambda " () => " to run. </param>
         /// <param name="delayInSeconds">The delay before running the method.</param>
         /// <param name="debugLog">Whether or not to debug the waiting message.</param>
@@ -83,7 +83,7 @@ namespace Essentials
         {
             if (debugLog) Debug.Log($"Waiting for {delayInSeconds} seconds...");
             TimeSpan timeSpan = TimeSpan.FromSeconds(delayInSeconds);
-            await UniTask.Delay(timeSpan, cancellationToken: cancellationToken);
+            await UniTask.Delay(timeSpan, cancellationToken).AsTask();
             action();
             if (debugLog) Debug.Log("Action completed.");
         }

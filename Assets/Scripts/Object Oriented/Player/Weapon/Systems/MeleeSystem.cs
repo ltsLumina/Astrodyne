@@ -13,11 +13,11 @@ public class MeleeSystem : WeaponSystem
     [Header("Slashing Parameters"), SerializeField]
     SlashParameters slashParameters;
 
-    // Cached Hashes
-    readonly static int AttackID = Animator.StringToHash("attack");
+    // Cached Hashes for the animator.
+    readonly static int DoAttack = Animator.StringToHash("doAttack");
 
     // Properties
-    // The currently active slash effect. Used to flip the slash effect depending on the direction of the mouse.
+    // The currently active slash effect. Used to flip the slash effect every other slash.
     public GameObject ActiveSlash { get; private set; }
     public SlashParameters SlashData
     {
@@ -57,7 +57,7 @@ public class MeleeSystem : WeaponSystem
 
         var pooledSlashAnim = pooledSlash.GetComponent<Animator>();
 
-        pooledSlashAnim.SetTrigger(AttackID);
+        pooledSlashAnim.SetTrigger(DoAttack);
         pooledSlashAnim.speed = WeaponData.animationSpeedScalar;
 
         float slashSize = dash.IsDashAttacking ? SlashData.dashAttackSlashSize : SlashData.slashSize;

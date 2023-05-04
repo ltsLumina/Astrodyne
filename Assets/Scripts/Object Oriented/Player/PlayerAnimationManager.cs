@@ -42,8 +42,8 @@ public class PlayerAnimationManager : MonoBehaviour
     { // Smoothly rotates player to face mouse.
         Vector3 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
 
-        // Flip the sprite if the mouse is on the left side of the player
-        if (mousePos.x < transform.position.x)
+        // Flips the sprite if the mouse is to the left of the player.
+        if (mousePos.x > transform.position.x)
         {
             sprite.flipX  = true;
             player.IsFacingRight = false;
@@ -62,7 +62,9 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         afterImage.SetActive(true);
 
-        float totalDuration = parSys.startLifetime.constant;
+        const float returnDelay = 0.25f;
+
+        float totalDuration = parSys.startLifetime.constant + returnDelay;
 
         yield return new WaitForSeconds(totalDuration);
 
@@ -73,10 +75,13 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         float timeElapsed = 0f;
 
+        // Get reference to the colour
+        Color originalColour = sprite.color;
+
         // Flash the player red.
         sprite.color = Color.red;
         yield return new WaitForSeconds(0.1f);
-        sprite.color = Color.white;
+        sprite.color = originalColour;
         yield return new WaitForSeconds(0.1f);
 
         while (timeElapsed < duration)

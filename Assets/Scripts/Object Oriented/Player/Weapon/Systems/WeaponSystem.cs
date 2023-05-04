@@ -10,16 +10,9 @@ using UnityEngine;
 /// </summary>
 public abstract class WeaponSystem : MonoBehaviour
 {
-    [Header("Common Parameters"), SerializeField, Tooltip("The prefab to be used in instantiating the attack. I.e the bullet, slash, etc.")]
+    [Header("Common Parameters"), SerializeField,
+     Tooltip("The prefab to be used in instantiating the attack. I.e the bullet, slash, etc.")]
     WeaponDefinition weaponData;
-
-    [Space(5)]
-
-    //[SerializeField, Tooltip("How long the player must wait before attacking again.")] //TODO: set attack rate value to bullets per minute
-    //protected float attackRate;
-
-    //[SerializeField, Tooltip("How long the attack will last before being returned to the pool.")]
-    //protected float attackLifetime;
 
     [Space(5)]
 
@@ -30,7 +23,7 @@ public abstract class WeaponSystem : MonoBehaviour
     protected Camera cam;
     protected Dash dash;
 
-    public ObjectPool AttackPool { get; set; }
+    protected ObjectPool AttackPool { get; private set; }
 
     // Returns the direction of the mouse relative to the player.
     protected Vector3 MousePlayerOffset => (Input.mousePosition - cam.WorldToScreenPoint(transform.position)).normalized;
