@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using static Essentials.UsefulMethods;
+using static Essentials.Attributes;
+using static Essentials.Deprecated;
 using static SceneManagerExtended;
-using ReadOnly = Essentials.ReadOnlyAttribute;
 
 public class GameManager : SingletonPersistent<GameManager>
 {

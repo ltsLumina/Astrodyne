@@ -1,11 +1,9 @@
-using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static Essentials.UsefulMethods;
+using static Essentials.Deprecated;
 
 public class LoadingScreen : MonoBehaviour
 {

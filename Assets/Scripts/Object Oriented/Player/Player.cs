@@ -1,9 +1,9 @@
 #region
-using System.Collections;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Essentials;
-using static Essentials.UsefulMethods;
+using static Essentials.Attributes;
+using static Essentials.Sequencing;
+using static Essentials.Deprecated;
 using static UnityEngine.Debug;
 #endregion
 
@@ -11,7 +11,6 @@ using static UnityEngine.Debug;
 public class Player : MonoBehaviour, IDamageable
 {
     #region Cached References
-    [Header("Cached References")]
     CapsuleCollider2D hitbox;
     Camera cam;
     SpriteRenderer sprite;
@@ -24,7 +23,7 @@ public class Player : MonoBehaviour, IDamageable
 
     [Header("Health"), Space(5), SerializeField]
     int health = 100;
-    const int maxHealth = 100;
+    const int MAX_HEALTH = 100;
     int previousHealth;
 
     [Header("Read-only Fields")]
@@ -56,7 +55,7 @@ public class Player : MonoBehaviour, IDamageable
         {
             previousHealth = health;
             health  = value;
-            health  = Mathf.Clamp(health, 0, maxHealth);
+            health  = Mathf.Clamp(health, 0, MAX_HEALTH);
 
             if (health < previousHealth)
                 onPlayerTakeDamage?.Invoke();
@@ -157,25 +156,22 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     // Void method necessary to subscribe to the delegate in the CurrentHealth property.
-    public void PerformOnTakeDamage() => StartCoroutine(OnTakeDamage());
+    public void PerformOnTakeDamage() => OnTakeDamage();
 
-    IEnumerator OnTakeDamage()
+    void OnTakeDamage()
     {
         // If the player is dead, stop the coroutine.
-        if (Health == 0) yield break;
+        if (Health == 0) return; // yield break;
 
         // Camera shake to indicate damage has been taken.
         CameraShake.Instance.ShakeCamera(1.5f, 0.2f);
 
         // Disable the hitbox for 1 second to prevent the player from taking damage multiple times.
-        hitbox.enabled = false;
-        DelayedTaskAsync(() => hitbox.enabled = true, 0.5f).AsTask();
+        StartCoroutine(SequenceActions(() => hitbox.enabled = false, 1f, () => hitbox.enabled = true));
 
         // Blink the sprite to indicate damage has been taken and invincibility frames.
         StartCoroutine(PlayerAnimationManager.SpriteRoutine(0.5f, sprite));
         //TODO: Keep in mind that we are disabling the collider for a time here. I.e, the player becomes "ghosted", meaning they can pass through walls and enemies.
-
-
     }
 
     void HandleDeath()

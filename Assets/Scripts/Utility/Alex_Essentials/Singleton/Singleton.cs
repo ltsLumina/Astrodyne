@@ -2,8 +2,10 @@
 using UnityEngine;
 #endregion
 
+// Singleton class that persists through scenes.
 [DefaultExecutionOrder(-2)]
-public sealed class Singleton<T> : MonoBehaviour where T : Component
+public sealed class Singleton<T> : MonoBehaviour
+    where T : Component
 {
     static T instance;
 
@@ -33,7 +35,12 @@ public sealed class Singleton<T> : MonoBehaviour where T : Component
     }
 }
 
-public class SingletonPersistent<T> : MonoBehaviour where T : Component
+/// <summary>
+///     Allows you to create a singleton that persists through scenes by inheriting from this class.
+/// </summary>
+/// <typeparam name="T"> The class to turn into a singleton. </typeparam>
+public class SingletonPersistent<T> : MonoBehaviour
+    where T : Component
 {
     static T instance;
 

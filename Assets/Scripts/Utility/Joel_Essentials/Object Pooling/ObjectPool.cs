@@ -1,5 +1,6 @@
 #region
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 #endregion
 
@@ -11,8 +12,7 @@ public class ObjectPool : MonoBehaviour
     readonly List<GameObject> pooledObjects = new();
 
     void Awake() =>
-
-        // Clear the pooledObjects list in case it's not empty. This prevents errors when using quicker load times in the editor.
+        // Clear the pooledObjects list in case it's not empty. This prevents errors when using Unity Editor Mode options.
         pooledObjects.Clear();
 
     void Start()
@@ -61,13 +61,10 @@ public class ObjectPool : MonoBehaviour
     /// <returns></returns>
     public GameObject GetPooledObject(bool setActive = false)
     {
-        for (int i = 0; i < pooledObjects.Count; i++)
+        foreach (GameObject pooledObject in pooledObjects.Where(pooledObject => !pooledObject.activeInHierarchy))
         {
-            if (!pooledObjects[i].activeInHierarchy)
-            {
-                pooledObjects[i].SetActive(setActive);
-                return pooledObjects[i];
-            }
+            pooledObject.SetActive(setActive);
+            return pooledObject;
         }
 
         GameObject objectToReturn = CreatePooledObject();

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using Essentials;
 using UnityEngine;
+using static Essentials.Attributes;
 
 public class Slug : Enemy
 {

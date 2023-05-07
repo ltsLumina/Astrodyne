@@ -1,6 +1,6 @@
-using Essentials;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Essentials.Attributes;
 using static GameManager;
 
 /// <summary>

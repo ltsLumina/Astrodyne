@@ -12,19 +12,10 @@ public class CameraShake : MonoBehaviour
     float shakeTimer;
 
     void Awake()
-    {
+    { // Create a singleton instance
         Instance = this;
 
-        // if (Instance == null)
-        // {
-        //     Instance = this;
-        //     DontDestroyOnLoad(gameObject);
-        // }
-        // else
-        // {
-        //     Destroy(gameObject);
-        // }
-
+        // Cache the virtual camera from the scene
         cinemachineVCam = GetComponent<CinemachineVirtualCamera>();
     }
 
@@ -32,8 +23,8 @@ public class CameraShake : MonoBehaviour
     /// Camera Shake for Cinemachine.
     /// <remarks>Syntax: CameraShake.instance.ShakeCamera(1.5f, 0.2f);</remarks>
     /// </summary>
-    /// <param name="intensity"></param>
-    /// <param name="time"></param>
+    /// <param name="intensity"> The amount the screen shakes.</param>
+    /// <param name="time"> Duration the shake occurs for.</param>
     public void ShakeCamera(float intensity, float time)
     {
         CinemachineBasicMultiChannelPerlin cinemachinePerlin =
@@ -46,10 +37,13 @@ public class CameraShake : MonoBehaviour
     void Update()
     {
         if (!(shakeTimer > 0)) return;
-        shakeTimer -= Time.deltaTime;
-        if (!(shakeTimer <= 0f)) return;
 
-        //time over
+        shakeTimer -= Time.deltaTime;
+        if (shakeTimer <= 0f) StopCameraShake();
+    }
+
+    void StopCameraShake()
+    {
         CinemachineBasicMultiChannelPerlin cinemachinePerlin =
             cinemachineVCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 

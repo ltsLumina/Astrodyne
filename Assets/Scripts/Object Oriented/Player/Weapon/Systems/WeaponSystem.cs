@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Essentials;
 using UnityEngine;
+using static Essentials.Attributes;
+using static Essentials.Deprecated;
 #endregion
 
 /// <summary>
@@ -86,7 +88,7 @@ public abstract class WeaponSystem : MonoBehaviour
     protected virtual void PostAttack(GameObject pooledAttack)
     {
         // Return the attack to the pool after attackLifetime seconds.
-        Task delayTask = UsefulMethods.DelayedTaskAsync(() => pooledAttack.SetActive(false), WeaponData.lifetime).AsTask();
+        Task delayTask = DelayedTaskAsync(() => pooledAttack.SetActive(false), WeaponData.lifetime).AsTask();
         delayTask.ContinueWith(_ => Debug.Log($"{WeaponData.weaponPrefab.name} returned to pool!"));
 
         // Reset the attack timer.

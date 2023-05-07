@@ -1,5 +1,6 @@
 #region
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 #endregion
@@ -22,10 +23,8 @@ public static class SceneManagerExtended
     /// <summary>
     ///     Reloads the currently active scene.
     /// </summary>
-    public static void ReloadScene()
-    {
+    public static void ReloadScene() =>
         SceneManager.LoadScene(ClampBuildIndex(SceneManager.GetActiveScene().buildIndex));
-    }
 
     /// <summary>
     ///     Loads the next scene according to build index order.
@@ -41,9 +40,8 @@ public static class SceneManagerExtended
     /// </summary>
     public static void LoadPreviousScene() => SceneManager.LoadScene(ClampBuildIndex(previousScene));
 
-
     /// <summary>
-    /// Asynchronously loads the scene with the specified build index.
+    ///     Asynchronously loads the scene with the specified build index.
     /// </summary>
     /// <param name="scene"></param>
     /// <returns></returns>
@@ -63,7 +61,7 @@ public static class SceneManagerExtended
     }
 
     /// <summary>
-    /// Overload of LoadSceneAsync that loads the *next* scene according to the specified build index.
+    ///     Overload of LoadSceneAsync that loads the *next* scene according to the specified build index.
     /// </summary>
     public static IEnumerator LoadNextSceneAsync()
     {
@@ -83,6 +81,7 @@ public static class SceneManagerExtended
             Debug.LogWarning("BuildIndex invalid/unavailable. Loading scene with an index of 0...");
             buildIndex = 0;
         }
+
         return buildIndex;
     }
 
@@ -93,7 +92,7 @@ public static class SceneManagerExtended
     {
 #if UNITY_EDITOR
         Debug.Log("Quitting game...");
-        UnityEditor.EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif

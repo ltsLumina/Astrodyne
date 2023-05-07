@@ -1,7 +1,7 @@
 #region
 using System.Collections;
 using UnityEngine;
-using Essentials;
+using static Essentials.Attributes;
 using static UnityEngine.Debug;
 #endregion
 
