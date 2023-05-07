@@ -1,3 +1,8 @@
+
+// Comment out the "#define" statement below if you are not using cinemachine in your project.
+#define USING_CINEMACHINE
+
+#if USING_CINEMACHINE
 #region
 using Cinemachine;
 using UnityEngine;
@@ -50,3 +55,4 @@ public class CameraShake : MonoBehaviour
         cinemachinePerlin.m_AmplitudeGain = 0f;
     }
 }
+#endif

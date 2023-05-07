@@ -53,7 +53,7 @@ public class SlashEffect : MonoBehaviour
     // I need to decouple these two things and move the damage dealing to the enemy script or a separate script or interface.
     void PerformSlash(Component other)
     {
-        Debug.Log($"Hit {other.gameObject.name} for {weaponData.damage} damage!");
+        Debug.Log($"Hit {other.gameObject.name}");
         var enemyComponent = other.gameObject.TryGetComponent<Enemy>(out var enemy) ? enemy : null;
 
         if (enemyComponent == null) return; // Deal damage to the enemy.

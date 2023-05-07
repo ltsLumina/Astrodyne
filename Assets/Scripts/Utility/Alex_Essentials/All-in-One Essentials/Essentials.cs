@@ -17,6 +17,7 @@ using Cysharp.Threading.Tasks;
 
 namespace Essentials
 {
+#if UNITY_EDITOR
     public static class Shortcuts
     {
         /// <summary>
@@ -31,6 +32,7 @@ namespace Essentials
             method?.Invoke(new object(), null);
         }
     }
+#endif
 
     public static class Sequencing
     {

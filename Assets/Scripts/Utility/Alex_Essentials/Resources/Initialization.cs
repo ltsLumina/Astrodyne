@@ -1,6 +1,6 @@
 ﻿
-
-#define INITIALIZATION_ENABLED
+// Comment out the #define statement to disable the use of the initialization script.
+//#define INITIALIZATION_ENABLED
 
 #region
 using UnityEngine;

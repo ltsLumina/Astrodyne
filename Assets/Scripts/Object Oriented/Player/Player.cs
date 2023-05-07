@@ -179,6 +179,7 @@ public class Player : MonoBehaviour, IDamageable
         // Debug that the player is dead and freeze their movement.
         Log("Player is dead.");
         RB.FreezeAllConstraints();
+        RB.FreezeConstraints(RigidbodyConstraints2DExtended.Constraints.FreezeX);
 
         // Unsubscribe from the delegate when the player is dead.
         onPlayerTakeDamage -= PerformOnTakeDamage;
