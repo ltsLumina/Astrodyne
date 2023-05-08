@@ -1,11 +1,20 @@
-﻿#region
+﻿// UNCOMMENT THIS BEFORE UPDATING ESSENTIALS
+//#define FOR_ESSENTIALS
+
+#if FOR_ESSENTIALS
+#region
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 #endregion
 
-public class EnemyDataType : ScriptableObject, IDamageable
+/// <summary>
+/// An example of a data type that can be created as a child to the DataTypeContainer scriptable object.
+/// This class is a simple enemy type, such as a goblin or skeleton perhaps.
+/// Add whichever variables and methods you want, and use it as you wish.
+/// </summary>
+public class EnemyDataType : ScriptableObject
 {
     [SerializeField] DataTypeContainer myDataTypeContainer;
 
@@ -66,3 +75,4 @@ public class EnemyDataType : ScriptableObject, IDamageable
     }
 #endif
 }
+#endif

@@ -6,15 +6,15 @@ using UnityEditor;
 #endif
 #endregion
 
-[CreateAssetMenu(fileName = "Container Data Type", menuName = "Containers/Create ContainerDataType")]
-public class ContainerDataType : ScriptableObject
+[CreateAssetMenu(fileName = "Data Type Container", menuName = "Containers/Create DataTypeContainer")]
+public class DataTypeContainer : ScriptableObject
 {
-    [SerializeField] List<EnemyDataType> _damageTypes = new ();
+    [SerializeField] List<EnemyDataType> dataTypes = new();
 
     public List<EnemyDataType> DamageTypes
     {
-        get => _damageTypes;
-        set => _damageTypes = value;
+        get => dataTypes;
+        set => dataTypes = value;
     }
 
 #if UNITY_EDITOR
@@ -24,7 +24,7 @@ public class ContainerDataType : ScriptableObject
         var damageType = CreateInstance<EnemyDataType>();
         damageType.name = "New Damage Type";
         damageType.Initialise(this);
-        _damageTypes.Add(damageType);
+        dataTypes.Add(damageType);
 
         AssetDatabase.AddObjectToAsset(damageType, this);
         AssetDatabase.SaveAssets();
@@ -39,16 +39,15 @@ public class ContainerDataType : ScriptableObject
     [ContextMenu("Delete all")]
     void DeleteAll()
     {
-        for (int i = _damageTypes.Count; i-- > 0;)
+        for (int i = dataTypes.Count; i-- > 0;)
         {
-            EnemyDataType tmp = _damageTypes[i];
+            EnemyDataType tmp = dataTypes[i];
 
-            _damageTypes.Remove(tmp);
+            dataTypes.Remove(tmp);
             Undo.DestroyObjectImmediate(tmp);
         }
 
         AssetDatabase.SaveAssets();
     }
-
 #endif
 }
