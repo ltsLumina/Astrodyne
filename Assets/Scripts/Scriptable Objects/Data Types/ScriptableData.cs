@@ -5,17 +5,16 @@ using UnityEditor;
 #endif
 #endregion
 
-public class EnemyDataType : ScriptableObject, IDamageable
+public class ScriptableData : ScriptableObject
 {
-    [SerializeField] DataTypeContainer myDataTypeContainer;
+    [SerializeField] ScriptableDataContainer myDataContainer;
 
     [SerializeField] string objectName;
     [SerializeField] int damage;
     [SerializeField] float attackDelay;
     [SerializeField] float moveSpeed;
-    [SerializeField] int health;
 
-    public DataTypeContainer MyDataTypeContainer => myDataTypeContainer;
+    public ScriptableDataContainer MyDataContainer => myDataContainer;
     public string ObjectName => objectName;
 
     public int Damage
@@ -36,20 +35,14 @@ public class EnemyDataType : ScriptableObject, IDamageable
         set => moveSpeed = value;
     }
 
-    public int Health
-    {
-        get => health;
-        set => health = value;
-    }
-
 
 #if UNITY_EDITOR
-    public void Initialise(DataTypeContainer myDataTypeContainer) => this.myDataTypeContainer = myDataTypeContainer;
+    public void Initialise(ScriptableDataContainer myScriptableDataContainer) => myDataContainer = myScriptableDataContainer;
 #endif
 
 #if UNITY_EDITOR
     [ContextMenu("Rename to name")]
-    void Rename()
+    public void Rename()
     {
         name = objectName;
         AssetDatabase.SaveAssets();
@@ -59,11 +52,32 @@ public class EnemyDataType : ScriptableObject, IDamageable
 
 #if UNITY_EDITOR
     [ContextMenu("Delete this")]
-    void DeleteThis()
+    public void Delete()
     {
-        myDataTypeContainer.DamageTypes.Remove(this);
+        myDataContainer.BlankScriptableData.Remove(this);
         Undo.DestroyObjectImmediate(this);
         AssetDatabase.SaveAssets();
     }
 #endif
+}
+
+[CustomEditor(typeof(ScriptableData))]
+public class ScriptableDataEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        var scriptableData = (ScriptableData)target;
+
+        if (GUILayout.Button("Rename Selected Data Type", GUILayout.Height(30)))
+        {
+            scriptableData.Rename();
+        }
+
+        if (GUILayout.Button("Delete Selected Data Types", GUILayout.Height(30)))
+        {
+            scriptableData.Delete();
+        }
+
+        DrawDefaultInspector();
+    }
 }

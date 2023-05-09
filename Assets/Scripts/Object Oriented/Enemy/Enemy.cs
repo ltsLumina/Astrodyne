@@ -10,7 +10,7 @@ using static GameManager;
 public abstract class Enemy : MonoBehaviour, IDamageable
 {
     [Header("Enemy Data")]
-    [SerializeField] EnemyDataType enemyData;
+    [SerializeField] ScriptableData enemyScriptableData;
     [SerializeField] int health;
 
     [Header("Read-only Fields"), SerializeField, ReadOnly]
@@ -24,11 +24,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         set => health = value;
     }
 
-    public EnemyDataType EnemyData
-    {
-        get => enemyData;
-        set => enemyData = value;
-    }
+    protected ScriptableData EnemyScriptableData => enemyScriptableData;
 
     protected abstract bool CanMove();
 
@@ -37,7 +33,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
         shootingData = FindObjectOfType<ShootingSystem>().WeaponData;
 
         // Set the health to the enemy data's health.
-        Health = EnemyData.Health;
+        //Health = EnemyData.Health;
     }
 
     protected virtual void Update()
@@ -53,7 +49,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     {
         switch (other.gameObject.tag)
         {
-            case "Player" when timeSinceLastAttack > EnemyData.AttackDelay:
+            case "Player" when timeSinceLastAttack > EnemyScriptableData.AttackDelay:
 
                 timeSinceLastAttack = 0;
                 Debug.Log("HIT PLAYER");
@@ -62,7 +58,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
 
                 // Take damage.
                 player.TryGetComponent(out IDamageable hit);
-                hit.Damage(EnemyData.Damage);
+                hit.Damage(EnemyScriptableData.Damage);
 
                 // Get the player's position.
                 var playerPos = player.transform.position;

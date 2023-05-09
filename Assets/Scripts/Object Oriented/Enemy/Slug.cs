@@ -16,7 +16,7 @@ public class Slug : Enemy
     protected override void Start()
     {
         base.Start();
-        moveSpeed = EnemyData.MoveSpeed;
+        moveSpeed = EnemyScriptableData.MoveSpeed;
     }
 
     protected override void Update()

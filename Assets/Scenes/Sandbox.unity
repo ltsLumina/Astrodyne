@@ -173,7 +173,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!50 &184500552
 Rigidbody2D:
   serializedVersion: 4
@@ -310,7 +310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47ee8fa49cbe495887ab2bde6c517d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyData: {fileID: -1775008054625008699, guid: f67e48923c1bc1a4f998e6c1e1d930ee, type: 2}
+  enemyData: {fileID: 0}
   health: 100
   timeSinceLastAttack: 0
   moveSpeed: 0
@@ -16396,7 +16396,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47ee8fa49cbe495887ab2bde6c517d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyData: {fileID: 542233697393614532, guid: f67e48923c1bc1a4f998e6c1e1d930ee, type: 2}
+  enemyData: {fileID: 0}
   health: 100
   timeSinceLastAttack: 0
   moveSpeed: 0
@@ -16873,7 +16873,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1173172552}
-  - component: {fileID: 1173172553}
   m_Layer: 0
   m_Name: Enemies
   m_TagString: Untagged
@@ -16898,20 +16897,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1173172553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1173172551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d0f0191e02149dca15180c4481bff26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 835409085}
-  spawnDelay: 1.5
 --- !u!1 &1188419711
 GameObject:
   m_ObjectHideFlags: 0
