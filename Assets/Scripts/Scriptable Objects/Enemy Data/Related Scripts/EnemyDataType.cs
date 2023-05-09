@@ -11,9 +11,9 @@ public class EnemyDataType : ScriptableObject, IDamageable
 
     [SerializeField] string objectName;
     [SerializeField] int damage;
+    [SerializeField] float attackDelay;
     [SerializeField] float moveSpeed;
     [SerializeField] int health;
-    [SerializeField] float attackDelay;
 
     public DataTypeContainer MyDataTypeContainer => myDataTypeContainer;
     public string ObjectName => objectName;
@@ -22,6 +22,12 @@ public class EnemyDataType : ScriptableObject, IDamageable
     {
         get => damage;
         set => damage = value;
+    }
+
+    public float AttackDelay
+    {
+        get => attackDelay;
+        set => attackDelay = value;
     }
 
     public float MoveSpeed
@@ -36,11 +42,6 @@ public class EnemyDataType : ScriptableObject, IDamageable
         set => health = value;
     }
 
-    public float AttackDelay
-    {
-        get => attackDelay;
-        set => attackDelay = value;
-    }
 
 #if UNITY_EDITOR
     public void Initialise(DataTypeContainer myDataTypeContainer) => this.myDataTypeContainer = myDataTypeContainer;
