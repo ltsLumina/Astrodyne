@@ -1,7 +1,7 @@
 // Comment out the following line to disable the use of deprecated features or plugin-related features. (If you get errors, comment this line out.)
 #define USE_DEPRECATED_FEATURES
 
-#region
+#region namespaces
 using System;
 using System.Collections;
 using System.Reflection;

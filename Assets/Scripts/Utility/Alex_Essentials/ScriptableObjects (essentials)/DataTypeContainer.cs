@@ -46,7 +46,7 @@ public class DataTypeContainer : ScriptableObject
 
 #if UNITY_EDITOR
     [ContextMenu("Delete all")]
-    void DeleteAll()
+    void DeleteAllDamageTypes()
     {
         for (int i = dataTypes.Count; i-- > 0;)
         {

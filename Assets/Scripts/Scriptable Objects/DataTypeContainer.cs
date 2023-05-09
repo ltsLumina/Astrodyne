@@ -18,8 +18,8 @@ public class DataTypeContainer : ScriptableObject
     }
 
 #if UNITY_EDITOR
-    [ContextMenu("Make New")]
-    void MakeNewDamageType()
+    [ContextMenu("Make New Damage Type")]
+    public void MakeNewDamageType()
     {
         var damageType = CreateInstance<EnemyDataType>();
         damageType.name = "New Damage Type";
@@ -36,8 +36,8 @@ public class DataTypeContainer : ScriptableObject
 #endif
 
 #if UNITY_EDITOR
-    [ContextMenu("Delete all")]
-    void DeleteAll()
+    [ContextMenu("Delete All Damage Types")]
+    public void DeleteAllDamageTypes()
     {
         for (int i = dataTypes.Count; i-- > 0;)
         {
@@ -50,4 +50,26 @@ public class DataTypeContainer : ScriptableObject
         AssetDatabase.SaveAssets();
     }
 #endif
+}
+
+[CustomEditor(typeof(DataTypeContainer))]
+public class DataTypeContainerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        var dataTypeContainer = (DataTypeContainer)target;
+
+        //TODO: rename all "damage" types to data type, and redo script to support it.
+        if (GUILayout.Button("Make New Damage Type", GUILayout.Height(30)))
+        {
+            dataTypeContainer.MakeNewDamageType();
+        }
+
+        if (GUILayout.Button("Delete All Damage Types", GUILayout.Height(30)))
+        {
+            dataTypeContainer.DeleteAllDamageTypes();
+        }
+
+        DrawDefaultInspector();
+    }
 }
